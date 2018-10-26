@@ -1,9 +1,8 @@
-deploy_install_hana.sh.j2  deployment_hanahosts_SID.conf.j2  deployment_hana_SID.cfg.j2
 ---
 - name: Create File for Scale-Out Enviornments
   template:
     src: deployment_hanahosts_SID.conf.j2
-    dest: /usr/local/bin/install_hana_{{ item.value.hana_sid|lower }}.conf
+    dest: /usr/local/bin/install_hana_{{ item.value.sid|lower }}.conf
     mode: 0755
   with_dict: "{{ instances }}"
 
@@ -12,23 +11,26 @@ deploy_install_hana.sh.j2  deployment_hanahosts_SID.conf.j2  deployment_hana_SID
 - name: copy installation answer file
   template:
     src: deployment_hana_SID.cfg.j2
-    dest: /tmp/hana_install_{{ item.value.hana_sid|lower}}.cfg
+    dest: /tmp/hana_install_{{ item.value.sid|lower}}.cfg
   with_dict: "{{ instances }}"
 
 - name: create usr sap directory
   file:
     path: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
+  with_dict: "{{ instances }}"
 
 - name: create hana shared directory
   file:
     path: "{{ volumes.hana_shared.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
+  with_dict: "{{ instances }}"
 
 - name: create hana data directory
   file:
-    path: "{{ volumes.Hana_data.mountpoint }}/{{ item.value.sid|upper }}"
+    path: "{{ volumes.hana_data.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
+  with_dict: "{{ instances }}"
 
 - name: create hana log directory
   file:
@@ -39,23 +41,23 @@ deploy_install_hana.sh.j2  deployment_hanahosts_SID.conf.j2  deployment_hana_SID
 - name: create sap sid group
   group: 
     name: "{{ item.value.sid|lower }}shm"
-    gid: "{{ item.value.sidadm_group_id }}
+    gid: "{{ item.value.sidadm_group_id }}"
   with_dict: "{{ instances }}"
 
 - name: create sap sid user
   user:
-    name: "{{ item.value.hana_sid|lower }}adm"
+    name: "{{ item.value.sid|lower }}adm"
     uid: "{{ item.value.sidadm_user_id }}"
     group: "sapsys"
     groups: "{{ item.value.sid|lower }}shm"
     home: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}/home"
-    password: "{{ item.value.sidadm_user_password|password_hash('sha512') }}"
-with_dict: "{{ instances }}"
+    password: "{{ item.value.sidadm_password|password_hash('sha512') }}"
+  with_dict: "{{ instances }}"
 
 - name: execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )
-  shell: ./hdblcm --configfile=/tmp/hana_install_{{ item.value.sid|lower}}.cfg -b --remote_execution=ssh{{ item.value.hdblcm_params| default('') }} >> /var/log/hana_install_{{ item.value.sid|lower}}.log
+  shell: ./hdblcm --configfile=/tmp/hana_install_{{ item.value.sid|lower}}.cfg -b --remote_execution=saphostagent {{ item.value.hdblcm_params| default('') }} >> /var/log/hana_install_{{ item.value.sid|lower}}.log
   args:
     chdir: "{{ hana_installdir }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"
     creates: "/usr/sap/{{ item.value.sid|upper }}/HDB{{ item.value.instance_number }}/exe/hdbdaemon"
+  when: deployment_instance is defined
   with_dict: "{{ instances }}"
-when: deployment_instance is defined

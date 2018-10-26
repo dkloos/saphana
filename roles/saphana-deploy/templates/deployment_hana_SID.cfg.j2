@@ -10,13 +10,13 @@ check_only={{ item.value.check_only | default('n') }}
 remote_execution=ssh
 
 # Enable the installation or upgrade of the SAP Host Agent ( Default: n )
-install_hostagent={{ item.value.hana.install_hostagent | default('y') }}
+install_hostagent={{ item.value.install_hostagent | default('y') }}
 
 # Local Host Name ( Default: eulc-sv-sapdb03 )
 hostname={{ item.value.instance_hostname }}
 
 # Additional Hosts
-addhosts={{ item.value.hana.addhosts | default('') }}
+addhosts={{ item.value.addhosts | default('') }}
 
 # Non-standard Shared File System
 checkmnt={{ item.value.check_shared_mount | default('') }}
@@ -64,7 +64,7 @@ password={{ item.value.sidadm_password }}
 home={{ item.value.sidadm_home | default('/usr/sap/${sid}/home') }}
 
 # System Administrator Login Shell ( Default: /bin/sh )
-shell={{ item.value.sidadm_shell | default('/bin/sh') }
+shell={{ item.value.sidadm_shell | default('/bin/sh') }}
 
 # System Administrator User ID
 userid={{ item.value.sidadm_user_id | default('')}}
@@ -73,13 +73,13 @@ userid={{ item.value.sidadm_user_id | default('')}}
 groupid={{ item.value.sapsys_group_id| default('') }}
 
 # Directory containing a storage configuration
-storage_cfg={{ item.value.storage_cfg | default('') }
+storage_cfg={{ item.value.storage_cfg | default('') }}
 
 # Internal Network Address
 internal_network={{ item.value.internal_network | default('') }}
 
 # Location of Data Volumes ( Default: ${sapmnt}/${sid}/global/hdb/data )
-datapath={{ item.value.data_path | default ('/hana/log/${sid}') }}
+datapath={{ volumes.data_path | default ('/hana/log/${sid}') }}
 
 # Location of Log Volumes ( Default: ${sapmnt}/${sid}/global/hdb/log )
 logpath={{ item.value.log_path | default ('/hana/log/${sid}') }}
@@ -97,7 +97,7 @@ restrict_max_mem={{ item.value.restrict_max_mem | default ('') }}
 max_mem={{ item.value.max_mem | default ('') }}
 
 # Database User (SYSTEM) Password
-system_user_password={{ item.value.system_user_password }}
+system_userr_password={{ item.value.system_password }}
 
 # Restart system after machine reboot? ( Default: n )
 autostart={{ item.value.autostart | default('n') }}
@@ -118,7 +118,7 @@ xs_engine_http_port={{ item.value.xs_engine_http_port | default('') }}
 xs_engine_https_port={{ item.value.xs_engine_https_port | default('') }}
 
 # Imports delivery units ( Default: y )
-import_content={{ item.value.import_content | default('y') }
+import_content={{ item.value.import_content | default('y') }}
 
 # Do not Modify '/etc/sudoers' File ( Default: n )
 skip_modify_sudoers=n

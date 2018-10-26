@@ -3,7 +3,8 @@
 # This role will create LVM Volumes for Hana if defined
 # ######################################################
 
+- include: ./hostagent.yml
 - include: ./deployment.yml
   tags:
-- hana-install
+    - hana-install
 
