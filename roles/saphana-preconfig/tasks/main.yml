@@ -1,0 +1,17 @@
+---
+# ##############################################################
+# This role will ensure SAP Hanan requirements are set on the OS
+# ##############################################################
+
+#- name: Enable Debugging
+#  debug:
+#    verbosity: "{{ debuglevel }}"
+
+- include: ./saphana-check-media.yml
+  tags:
+    - hana-install
+    - media-check
+
+- include: ./saphana-preconf.yml
+  tags:
+    - hana-install

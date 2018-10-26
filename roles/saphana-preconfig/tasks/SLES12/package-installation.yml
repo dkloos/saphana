@@ -1,0 +1,7 @@
+---
+
+- name: install packages
+  zypper:
+    state: latest
+    name: "{{ packages }}"
+  ignore_errors: True

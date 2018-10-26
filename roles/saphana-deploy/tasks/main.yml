@@ -1,0 +1,9 @@
+---
+# ######################################################
+# This role will create LVM Volumes for Hana if defined
+# ######################################################
+
+- include: ./deployment.yml
+  tags:
+- hana-install
+

@@ -1,0 +1,9 @@
+---
+# handlers file for saphana-preconfig
+- name: restart ntp
+  service:
+    name: ntpd
+    state: restarted
+
+- name: regenerate grub2 conf
+  shell: grub2-mkconfig -o /boot/grub2/grub.cfg

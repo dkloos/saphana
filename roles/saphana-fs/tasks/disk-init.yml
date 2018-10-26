@@ -1,0 +1,76 @@
+---
+- name: Esnure packages required are present
+  zypper:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - gdisk
+    - sg3_utils
+    - lvm2
+  tags:
+    - disk_init
+
+## Return Value of failed rescan command not yet tested
+- name: rescanning for new disks
+  shell: |
+   new_disk=0
+   if [ ! -b {{ item.key }} ]; then
+          /usr/bin/rescan-scsi-bus.sh
+          new_disk=1 
+          # if disk is not available after scan exit with error
+          [ ! -b {{ item.key }} ] && new_disk=2 && echo "ERROR: disk {{ item.key }} not found"
+   fi
+   exit ${new_disk}
+  register: newdisk
+  changed_when: newdisk.rc == 1
+  failed_when: newdisk.rc > 1
+  with_dict: "{{ disks }}"
+  when: ( disks is defined ) 
+  tags:
+    - disk_init
+
+- name: create disk partitions 
+  lvg:
+    vg: '{{ item.value }}'
+    pvs: '{{ item.key }}'
+    pesize: 32
+  with_dict: "{{ disks }}"
+  when: ( disks is defined ) 
+  tags:
+    - disk_init
+
+- name: create logical volumes
+  lvol:
+    vg: "{{ item.value.vg }}"
+    lv: "lv_{{ item.key }}"
+    size: "{{ item.value.size }}"
+    state: present
+    shrink: no
+  with_dict: "{{ volumes }}"
+  when: ( volumes is defined ) 
+  tags:
+    - disk_initA
+
+- name: create filesystems
+  filesystem:
+    dev:  /dev/{{ item.value.vg}}/lv_{{ item.key }}
+    fstype: "{{ item.value.fstype | default('xfs') }}"
+    force: no
+    opts: "{{ item.value.opts | default(omit) }}"
+  with_dict: "{{ volumes }}"
+  ignore_errors: True
+  tags:
+    - disk_init
+  when: ( volumes is defined ) 
+
+- name: mount and make fstab entries
+  mount:
+    name: "{{ item.value.mountpoint }}"
+    fstype: "{{ item.value.fstype | default('xfs') }}"
+    opts: defaults
+    src: "/dev/{{ item.value.vg }}/lv_{{ item.key }}"
+    state: mounted
+  with_dict: "{{ volumes }}"
+  tags:
+    - disk_init
+  when: ( volumes is defined ) 

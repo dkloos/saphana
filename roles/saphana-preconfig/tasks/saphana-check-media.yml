@@ -1,0 +1,13 @@
+---
+- name: Ensure InstallationDir is there 
+  file:
+    name: "{{  hana_installdir }}"
+    state: directory
+
+- name: Get HANA Version Information
+  shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ hana_installdir }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest
+  register: hana_version
+
+- name: Make HANA Version persistent
+  set_fact: 
+  hana_version: hana_version.stdout

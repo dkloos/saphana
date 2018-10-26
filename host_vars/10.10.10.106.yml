@@ -1,0 +1,69 @@
+---
+# OS Settings
+
+registration:
+  regcode: test
+  email: test
+
+hostname: euin-sv-sles
+
+nameserver:
+  - 192.168.112.131
+  - 192.168.112.136
+ntpserver: 
+  ip: 192.168.112.130
+  timezone: Etc/UTC
+packages:
+  - tuned
+  - nfs-util
+  - htop
+  - saptune
+saptune_solution: Hana
+
+
+# disk-init role variables
+disks:
+  /dev/sdb: vg_data
+  /dev/sdc: vg_log
+  /dev/sdd: vg_shared
+volumes:
+  hana_data:
+    size: 2G
+    vg: vg_data
+    mountpoint: /hana/data
+  hana_logs:
+    size: 400M
+    vg: vg_log
+    mountpoint: /hana/log
+  hana_shared:
+    size: 20M
+    vg: vg_shared
+    mountpoint: /hana/shared
+  usr_sap:
+    size: 50M
+    vg: vg_shared
+    mountpoint: /usr/sap
+
+# Install media
+hana_installdir : /hana/instmedia/51052325
+
+# HANA DB
+instance:
+  GRC:
+    check_only: n
+    install_hostagent: y
+    instance_honstname: "{{ hostname }}"
+    install_ssh_key: 
+    db_isolation: low
+    sid: GRC
+    instance_number: 00
+    sidadm_user_id: 1001
+    sidadm_group_id: 1001
+    # USe values:  production | test | development | custom 
+    hana_system_usage: development
+    # Host to add if isntallation is scale out
+    addhosts:
+    # On scale out systems /hana/shared musste be r/w by all hosts - Leave emty on scale up
+    check_shared_mount:
+    # additional Paramters for the hdblcm
+    hdblcm_params:

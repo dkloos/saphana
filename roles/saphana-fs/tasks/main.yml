@@ -1,0 +1,7 @@
+---
+# ######################################################
+# This role will create LVM Volumes for Hana if defined
+# ######################################################
+
+- include: disk-init.yml
+  when: not( (disks is undefined) or (disks is none) or (disks | trim == '') )

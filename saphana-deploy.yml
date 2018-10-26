@@ -1,0 +1,6 @@
+---
+- hosts: saphana
+  roles:
+    - saphana-fs
+    - saphana-preconfig
+    - saphana-deploy

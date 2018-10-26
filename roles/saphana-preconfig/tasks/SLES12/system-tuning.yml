@@ -1,0 +1,30 @@
+---
+- name: setting kernel tunables
+  sysctl: name={{ item.name }} value={{ item.value }} state=present sysctl_set=yes reload=yes
+  with_items:
+#SAP Note: https://launchpad.support.sap.com/#/notes/2382421
+    - { name: net.core.somaxconn, value: 4096  }
+    - { name: net.ipv4.tcp_max_syn_backlog, value: 8192 }
+    - { name: net.ipv4.tcp_tw_reuse, value: 1 }
+    - { name: net.ipv4.tcp_tw_recycle, value: 1 }
+    - { name: net.ipv4.tcp_slow_start_after_idle, value: 0 }
+
+# SAP Note: https://launchpad.support.sap.com/#/notes/1275776
+- name: activate saptune 
+  shell: saptune daemon start
+  ignore_errors: True
+
+- name: activate saptune
+  shell: "saptune solution apply {{ saptune_solution }}"
+  ignore_errors: True
+
+#SAP Note: https://launchpad.support.sap.com/#/notes/2205917
+- name: disable intel c states in grub config (RHEL 7)
+  lineinfile: 
+    dest: /etc/default/grub 
+    line: GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 numa_balancing=disable"
+  notify: regenerate grub2 conf
+  ignore_erros: True
+  when: "ansible_os_family == 'SLES'"
+
+

@@ -1,0 +1,125 @@
+[Server]
+
+# Skip all SAP Host Agent calls ( Default: n )
+skip_hostagent_calls=n
+
+# Executes checks, does not install SAP HANA System ( Default: n )
+check_only={{ item.value.check_only | default('n') }}
+
+# Remote Execution ( Default: ssh; Valid values: ssh | saphostagent )
+remote_execution=ssh
+
+# Enable the installation or upgrade of the SAP Host Agent ( Default: n )
+install_hostagent={{ item.value.hana.install_hostagent | default('y') }}
+
+# Local Host Name ( Default: eulc-sv-sapdb03 )
+hostname={{ item.value.instance_hostname }}
+
+# Additional Hosts
+addhosts={{ item.value.hana.addhosts | default('') }}
+
+# Non-standard Shared File System
+checkmnt={{ item.value.check_shared_mount | default('') }}
+
+# Installation Path ( Default: /hana/shared )
+sapmnt={{ volumes.hana_shared.mountpoint | default('/hana/shared') }}
+
+# Install SSH Key ( Default: y )
+install_ssh_key={{ item.value.install_ssh_key | default('y') }}
+
+# Root User Name ( Default: root )
+root_user={{ item.value.root_user | default('root') }}
+
+# Root User Password
+root_password={{ item.value.root_password | default('') }}
+
+# SAP Host Agent User (sapadm) Password
+sapadm_password={{ item.value.sapadm_password }}
+
+# SAP HANA System ID
+sid={{ item.value.sid|upper }}
+
+# Instance Number ( Valid values: 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 1 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 6983 | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 )
+number={{ item.value.instance_number }}
+
+# Worker Group ( Default: default )
+workergroup=default
+
+# Database Isolation ( Default: low; Valid values: low | high )
+db_isolation={{ item.value.db_isolation | default('low') }}
+
+# Create initial tenant database ( Default: y )
+create_initial_tenant=y
+
+# Auto Initialize Services ( Default: y )
+auto_initialize_services=y
+
+# System Usage ( Default: custom; Valid values: production | test | development
+system_usage={{ item.value.system_usage }}
+
+# System Administrator Password
+password={{ item.value.sidadm_password }}
+
+# System Administrator Home Directory ( Default: /usr/sap/${sid}/home )
+home={{ item.value.sidadm_home | default('/usr/sap/${sid}/home') }}
+
+# System Administrator Login Shell ( Default: /bin/sh )
+shell={{ item.value.sidadm_shell | default('/bin/sh') }
+
+# System Administrator User ID
+userid={{ item.value.sidadm_user_id | default('')}}
+
+# ID of User Group (sapsys)
+groupid={{ item.value.sapsys_group_id| default('') }}
+
+# Directory containing a storage configuration
+storage_cfg={{ item.value.storage_cfg | default('') }
+
+# Internal Network Address
+internal_network={{ item.value.internal_network | default('') }}
+
+# Location of Data Volumes ( Default: ${sapmnt}/${sid}/global/hdb/data )
+datapath={{ item.value.data_path | default ('/hana/log/${sid}') }}
+
+# Location of Log Volumes ( Default: ${sapmnt}/${sid}/global/hdb/log )
+logpath={{ item.value.log_path | default ('/hana/log/${sid}') }}
+
+# Directory containing custom configurations
+custom_cfg={{ item.value.custom_cfg | default('') }}
+
+# Change the initial SSFS key ( Default: y )
+change_initial_ssfs_key=y
+
+# Restrict maximum memory allocation?
+restrict_max_mem={{ item.value.restrict_max_mem | default ('') }}
+
+# Maximum Memory Allocation in MB
+max_mem={{ item.value.max_mem | default ('') }}
+
+# Database User (SYSTEM) Password
+system_user_password={{ item.value.system_user_password }}
+
+# Restart system after machine reboot? ( Default: n )
+autostart={{ item.value.autostart | default('n') }}
+
+# Enable HANA repository ( Default: y )
+repository={{ item.value.repository | default('y') }}
+
+# Inter Service Communication Mode ( Valid values: standard | ssl )
+isc_mode={{ item.value.isc_mode | default('') }}
+
+# Enable XS Engine ( Default: y )
+xs_engine={{ item.value.xs_engine | default('y') }}
+
+# XS Engine HTTP Port
+xs_engine_http_port={{ item.value.xs_engine_http_port | default('') }}
+
+# XS Engine HTTPS Port
+xs_engine_https_port={{ item.value.xs_engine_https_port | default('') }}
+
+# Imports delivery units ( Default: y )
+import_content={{ item.value.import_content | default('y') }
+
+# Do not Modify '/etc/sudoers' File ( Default: n )
+skip_modify_sudoers=n
+

@@ -1,0 +1,58 @@
+---
+- name: check / set hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: setting DNS config
+  lineinfile:
+    path: /etc/resolv.conf
+    line: "nameserver {{ item }}"
+  with_items: "{{ nameserver }}"
+
+########################
+# Fix me Suse registration
+##########################
+# - name: check regitered status
+#  shell: SUSEConnect -s |awk -F: \'{print  \$5}\'| cut -d \" -f2|
+#  register: regstatus
+#  when: not ( (registration.regcode is undefined) or (registration.regcode is undefined is none) or (registration.regcode is undefined | trim == '') or (registration.email is undefined) or (registration.email is undefined is none) or (registration.email is undefined | trim == '') )
+
+#- name: register system
+#  shell: "SUSEConnect -r {{ item.regcode }} -e {{ item.email }}"
+#  with_items: "{{ registration }}"
+#  when: regstatus.value != "Not Registered"
+
+- name: setting NTP server
+  block:
+   - lineinfile:
+       path: /etc/ntp.conf
+       line: "server {{ ntpserver.ip }}"
+     notify: restart ntp
+   - timezone:
+       name: "{{ ntpserver.timezone }}"
+   - service:
+       name: ntpd
+       state: started
+       enabled: true
+  when: not( (ntpserver is undefined) or (ntpserver is none) or (ntpserver | trim == '') )
+
+
+### TODO: Configure Firewall according to instance number instead of disabling
+- name: disable firewalld
+  service: 
+    name: SuSEfirewall2
+    state: stopped
+    enabled: no
+
+- name: disable kdump
+  service: 
+    name: kdump
+    state: stopped
+    enabled: no
+
+- name: enable tuned
+  service: 
+    name: tuned 
+    state: started 
+    enabled: yes
+  ignore_errors: True

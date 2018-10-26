@@ -1,0 +1,16 @@
+---
+########################################################
+# Loading OS specific tasks
+########################################################
+- include: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/package-installation.yml' }}"
+  tags:
+    - osprep
+    - packages
+- include: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/os-configuration.yml' }}"
+  tags:
+    - osprep
+    - set-hostname
+- include: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/system-tuning.yml' }}"
+  tags:
+    - osprep
+    - system-tuning
