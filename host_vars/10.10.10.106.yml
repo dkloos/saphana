@@ -1,6 +1,16 @@
 ---
+#PXE enabled:
+pxenabled: yes
+
+
 # OS Settings
 
+interaface:
+  eth0:
+    ip: 182.168.207.41
+    mask: 255.255.255.128
+    mac: 00:50:56:94:ce:01
+    gateway: 192.168.207.1
 registration:
   regcode: test
   email: test
