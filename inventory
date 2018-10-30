@@ -3,3 +3,9 @@ localhost ansible_connection=local
 
 [gctest-saphana]
 192.168.207.51
+
+[solman-prod-saphana]
+192.168.207.35
+
+[solman-dev-saphana]
+192.168.207.34

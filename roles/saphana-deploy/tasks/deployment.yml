@@ -54,7 +54,7 @@
     password: "{{ item.value.sidadm_password|password_hash('sha512') }}"
   with_dict: "{{ instances }}"
 
-- name: execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )
+- name: "execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )"
   shell: ./hdblcm --configfile=/tmp/hana_install_{{ item.value.sid|lower}}.cfg -b --remote_execution=saphostagent {{ item.value.hdblcm_params| default('') }} >> /var/log/hana_install_{{ item.value.sid|lower}}.log
   args:
     chdir: "{{ hana_installdir }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"
