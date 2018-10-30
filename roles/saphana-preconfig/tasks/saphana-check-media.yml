@@ -17,10 +17,7 @@
 - name: Get HANA Version Information
   shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ hana_installdir }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest
   register: hana_version
-  ignore_errors: True
 
 - name: Make HANA Version persistent
   set_fact: 
   hana_version: hana_version.stdout
-  ignore_errors: True
-

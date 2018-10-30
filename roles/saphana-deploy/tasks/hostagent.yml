@@ -27,6 +27,16 @@
 #    dest: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
 #    mode: 0755
 
+- name: Installation File SAP HANA Host Agent
+  template:
+    src: preconfigure_sap_install_saphostagent.sh.j2
+    dest: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
+    mode: 0755
+
+- name: Install SAP HANA Host Agent
+  shell: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
+  args:
+  creates: /usr/sap/hostctrl/exe/saphostexec
 
 # Setup sap hana Hostagent SSL
 # http://help.sap.com/saphelp_nw73ehp1/helpdata/en/8d/12f7b9244b44219bd14d619d3a2123/content.htm

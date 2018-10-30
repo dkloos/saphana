@@ -12,11 +12,10 @@
 # SAP Note: https://launchpad.support.sap.com/#/notes/1275776
 - name: activate saptune 
   shell: saptune daemon start
-  ignore_errors: True
 
 - name: activate saptune
   shell: "saptune solution apply {{ saptune_solution }}"
-  ignore_errors: True
+  ignore_errors: yes
 
 #SAP Note: https://launchpad.support.sap.com/#/notes/2205917
 - name: disable intel c states in grub config (RHEL 7)
@@ -24,7 +23,4 @@
     dest: /etc/default/grub 
     line: GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 numa_balancing=disable"
   notify: regenerate grub2 conf
-  ignore_erros: True
   when: "ansible_os_family == 'SLES'"
-
-

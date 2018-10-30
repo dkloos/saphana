@@ -3,24 +3,44 @@
   hostname:
     name: "{{ hostname }}"
 
+- name: setting correct hostname in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "{{ hostname }}"
+    line: "{{ interface.eth0.ip }}  {{ hostname }}.{{ domain }}  {{ hostname }}"
+
 - name: setting DNS config
   lineinfile:
     path: /etc/resolv.conf
     line: "nameserver {{ item }}"
   with_items: "{{ nameserver }}"
 
+- name: remove DVD repo
+  zypper:
+    state: absent
+    name: 'SLE-12-SP3-SAP-12.3-0'
+
 ########################
 # Fix me Suse registration
 ##########################
-# - name: check regitered status
-#  shell: SUSEConnect -s |awk -F: \'{print  \$5}\'| cut -d \" -f2|
+#- name: check regitered status
+#  shell: SUSEConnect -s |awk -F: '{print  $5}'| cut -d \" -f2
 #  register: regstatus
 #  when: not ( (registration.regcode is undefined) or (registration.regcode is undefined is none) or (registration.regcode is undefined | trim == '') or (registration.email is undefined) or (registration.email is undefined is none) or (registration.email is undefined | trim == '') )
 
-#- name: register system
-#  shell: "SUSEConnect -r {{ item.regcode }} -e {{ item.email }}"
-#  with_items: "{{ registration }}"
-#  when: regstatus.value != "Not Registered"
+- name: register system
+  shell: "SUSEConnect -r {{ registration.regcode }} -e {{ registration.email }}"
+ # when: regstatus.value != "Not Registered"
+
+- name: refresh all repos
+  zypper_repository:
+    repo: '*'
+    runrefresh: yes
+
+- name: install packages
+  zypper:
+    state: latest
+    name: "{{ packages }}"
 
 - name: setting NTP server
   block:
@@ -55,4 +75,3 @@
     name: tuned 
     state: started 
     enabled: yes
-  ignore_errors: True

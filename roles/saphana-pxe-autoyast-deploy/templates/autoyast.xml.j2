@@ -128,6 +128,30 @@
       </routes>
     </routing>
   </networking>
+  <scripts>
+    <chroot-scripts config:type="list">
+      <script>
+        <chrooted config:type="boolean">true</chrooted>
+        <interpreter>shell</interpreter>
+        <filename>disable-ipv6.sh</filename>
+        <source>
+          <![CDATA[ 
+            echo "install ipv6 /bin/true" > /etc/modprobe.d/50-ipv6.conf
+          ]]>
+        </source>
+      </script>
+      <script>
+        <chrooted config:type="boolean">true</chrooted>
+        <interpreter>shell</interpreter>
+        <filename>create_root_ssh_dir.sh</filename>
+        <source>
+          <![CDATA[ 
+            mkdir /root/.ssh && chmod 700 /root/.ssh
+          ]]>
+        </source>
+      </script>
+    </chroot-scripts>
+  </scripts>
   <timezone>
     <hwclock>UTC</hwclock>
     <timezone>{{ ntpserver.timezone }}</timezone>

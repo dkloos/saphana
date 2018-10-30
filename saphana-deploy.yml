@@ -2,9 +2,8 @@
 - hosts: pxeserver
   roles:
     - saphana-pxe-autoyast-deploy
-- hosts: saphana
+- hosts: "*-saphana"
   roles:
-    - saphana-fs
     - saphana-preconfig
+    - saphana-fs
     - saphana-deploy
-

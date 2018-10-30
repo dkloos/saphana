@@ -1,12 +1,5 @@
-[saphana]
-192.168.207.51
 [pxeserver]
 localhost ansible_connection=local
 
-[install:children]
-pxeserver
-saphana
-
-[gctest:children]
-pxeserver
+[gctest-saphana]
 192.168.207.51

@@ -7,15 +7,15 @@ hostname: euin-sv-sles
 domain: ad.toyota-boshoku.be
 interface:
   eth0:
-    ip: 182.168.207.51
+    ip: 192.168.207.51
     mask: 255.255.255.128
     mac: 00:50:56:94:ce:01
     gateway: 192.168.207.1
 
 # Registration to SLES
 registration:
-  regcode: test
-  email: test
+  regcode: 178D28492BF90C
+  email: ddhangman@yahoo.de
 
 #################################
 # OS Settings    - GLOBAL
@@ -34,10 +34,9 @@ ntpserver:
   timezone: Europe/Brussels
 packages:
   - tuned
-  - nfs-util
-  - htop
+  - nfs-utils
   - saptune
-saptune_solution: Hana
+saptune_solution: HANA
 
 
 # disk-init role variables
@@ -67,7 +66,7 @@ volumes:
 #################################
 # SAP HANA DB  Settings - Host
 #################################
-
+deployment_instance: true
 # HANA DB
 instances:
   GRC:
