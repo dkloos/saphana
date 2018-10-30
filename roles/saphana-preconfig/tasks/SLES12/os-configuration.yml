@@ -16,7 +16,7 @@
   with_items: "{{ nameserver }}"
 
 - name: remove DVD repo
-  zypper:
+  zypper_repository:
     state: absent
     name: 'SLE-12-SP3-SAP-12.3-0'
 
@@ -69,6 +69,12 @@
     name: kdump
     state: stopped
     enabled: no
+
+- name: enable tuned
+  service: 
+    name: uuidd
+    state: started 
+    enabled: yes
 
 - name: enable tuned
   service: 

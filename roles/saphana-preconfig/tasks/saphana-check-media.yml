@@ -8,11 +8,11 @@
     - file:
         path: "{{ hana_installdir }}"
         state: directory
+      when: insdir.stat.isdir is not defined
     - synchronize:
         src: "{{ software.source.path }}"
         dest: "{{ software.dest.path }}"
       delegate_to: "{{ software.source.server }}"
-  when: insdir.stat.isdir is not defined
 
 - name: Get HANA Version Information
   shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ hana_installdir }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest

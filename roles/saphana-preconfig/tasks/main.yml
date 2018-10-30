@@ -12,6 +12,17 @@
     - hana-install
     - media-check
 
-- include: ./saphana-preconf.yml
+########################################################
+# Loading OS specific tasks
+########################################################
+- include: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/os-configuration.yml' }}"
   tags:
+    - osprep
+    - set-hostname
     - hana-install
+- include: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/system-tuning.yml' }}"
+  tags:
+    - osprep
+    - system-tuning
+    - hana-install
+

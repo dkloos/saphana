@@ -26,7 +26,6 @@ root_password_hash: $6$rIv3a6NiBB.y$raIZjoXIFeMCgbuD2Q4a9mo36wBwAfn8xhaOZFZFta3z
 ssh_keys_root_access: 
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDnrSSZHeeaEBeG29vQAV3WTbokgxFqjdmdbd/h3CpaTaTe+z5yulQRyoUMJ3vuh3MX4faQNyWiGWpsZWLFObqsoX8GdciprbO0z5TNZXmwSNAwH0/qCHUlQPCi6kG1DUWWh+RBMZAloEmao3nLyTU5IEJ3HQzkqny1LXzZtn6QuIqpDFc9aYx6WtSZubX5TbUN5Qm3hm+xdTqyuw0Jj+2YqzEnROVsdokkSJNpd/13FcBhJBKeZR5LoGY1mqyxAlKa7vYR52jL98WnFkcc6+O+Igk8aTJrn2u5g+WupGxh/1ArPNEHaGiLq5UZ3yb8EGbocZWe/wRrth6oj5hPQlTd imported-openssh-key
   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXXyLxu0eWenJKOwpMw97vbf9odU/l7h+CIUlvtR8GEFMZIYSrbwhQrbfdvGP2dum5R55TCrvHhwLiKCXGnrehoj1LIjI4l8Z6GAozEdA+4o2zB2f1zStum+7yKzqt5W611ibrIUb1dJf8yLZFxfIEAvhoq9xoBdlIFrW50UWOUtP7JIInelwPOAh4ZCt+SkBDcd4wPjALa1KfoIqzxCV/erOoGuhdHvtxrrmlExrA6ZnE8O6n7cPimDUAoMrwNN+OoUpOdGtCzpHOeyjtmvOgS8SD80CxHYggYwaqDFUUdSi74rHXr97FL4/o1kl52Ip/qmP+p+hddXwR2IAHkEB7 eulc-sv-sapdb03
-
 nameserver:
   - 192.168.112.131
   - 192.168.112.136
@@ -38,7 +37,6 @@ packages:
   - tuned
   - nfs-utils
   - saptune
-  - uuidd
 saptune_solution: HANA
 
 

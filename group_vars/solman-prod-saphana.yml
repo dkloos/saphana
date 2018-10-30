@@ -38,6 +38,7 @@ packages:
   - tuned
   - nfs-utils
   - saptune
+  - uuidd
 saptune_solution: HANA
 
 
