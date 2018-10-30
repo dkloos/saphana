@@ -1,8 +1,18 @@
 ---
-- name: Ensure InstallationDir is there 
-  file:
-    name: "{{  hana_installdir }}"
-    state: directory
+- stat:
+    path: "{{ hana_installdir }}"
+  register: insdir
+
+- name: Copy installon folder from source
+  block:
+    - file:
+        path: "{{ hana_installdir }}"
+        state: directory
+    - synchronize:
+        src: "{{ software.source.path }}"
+        dest: "{{ software.dest.path }}"
+      delegate_to: "{{ software.source.server }}"
+  when: insdir.stat.isdir is not defined
 
 - name: Get HANA Version Information
   shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ hana_installdir }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest

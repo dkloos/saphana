@@ -1,10 +1,12 @@
 [saphana]
-#10.10.10.106
-192.168.207.41
+192.168.207.51
 [pxeserver]
-#192.168.207.40
 localhost ansible_connection=local
 
 [install:children]
 pxeserver
 saphana
+
+[gctest:children]
+pxeserver
+192.168.207.51

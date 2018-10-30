@@ -1,0 +1,8 @@
+DEFAULT install
+PROMPT 0
+LABEL install
+MENU LABEL SLES 12 SP3 installation
+KERNEL img/SLES12SP3/linux
+APPEND initrd=img/SLES12SP3/initrd ifcfg=eth0=10.10.10.10/24,10.10.10.1 autoyast=http://10.10.10.1/ockimg/autoyast/{{ hostname }}.xml install=http://10.10.10.1/ockimg/SLES12SP3CD1
+IPAPPEND
+

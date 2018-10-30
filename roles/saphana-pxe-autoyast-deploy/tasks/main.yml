@@ -1,0 +1,55 @@
+---
+# tasks file for saphana-pxe-autoyast-deploy
+
+- name: enrole autoyast file to pxeserver
+  template:
+    src: autoyast.xml.j2
+    dest: "/var/lib/tftpboot/img/autoyast/{{ hostname }}.xml"
+
+- name: adding host to DHCP (group SLES12SP3)
+  blockinfile:
+    block: |
+      host {{ hostname }}.{{ domain }} {
+      ddns-hostname "{{ hostname }}";
+      option host-name "{{ hostname }}.{{ domain }}";
+      hardware ethernet {{ interface.eth0.mac }};
+      }
+    insertafter: "group { # SLES12SP3"
+    path: /etc/dhcp/dhcpd.conf
+
+- name: Copy PXE template to pxeserver
+  template:
+    src: pxefile-host.j2
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ interface.eth0.mac |regex_replace(':','-')|lower }}"
+
+######################################################################
+# Waiting until system  installation is triggered 
+######################################################################
+
+#FIXME: Feste boot IP aus pxe boot template mit variable ersetzen -> PXE host_vars
+- block:
+    - tempfile:
+        state: file
+      register: tempfile
+    - shell: tail -n 0 -f /var/log/httpd/access_log > {{ tempfile.path }}
+      async: 500
+      poll: 0
+    - name: Waiting for autoyastfile to be loaded by installer - Please start the System NOW!
+      wait_for:
+        path: "{{ tempfile.path }}"
+        search_regex: "10.10.10.10.*/autoyast/{{ hostname }}.xml"
+    - file:
+        path: "{{ tempfile.path }}"
+        state: absent
+    - name: remove PXE template
+      file:
+        state: absent
+        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ interface.eth0.mac |regex_replace(':','-')|lower }"
+
+- name: Wait for intallation to complete 
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 30
+    delay: 180
+    timeout: 2700
+  delegate_to: "{{ hostname }}.{{ domain }}"

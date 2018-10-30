@@ -1,0 +1,141 @@
+---
+#################################
+# OS Settings    - Host
+#################################
+
+hostname: euin-sv-sles
+domain: ad.toyota-boshoku.be
+interface:
+  eth0:
+    ip: 182.168.207.51
+    mask: 255.255.255.128
+    mac: 00:50:56:94:ce:01
+    gateway: 192.168.207.1
+
+# Registration to SLES
+registration:
+  regcode: test
+  email: test
+
+#################################
+# OS Settings    - GLOBAL
+#################################
+
+# Installation Root password (temporary)
+root_password_hash: $6$rIv3a6NiBB.y$raIZjoXIFeMCgbuD2Q4a9mo36wBwAfn8xhaOZFZFta3zZftHWPQVfByLhE/3CDk9vBVq0kMoIU3HiiQG8dnFs.
+
+nameserver:
+  - 192.168.112.131
+  - 192.168.112.136
+ntpserver: 
+  ip: 192.168.112.130
+# print zones with 'timedatectl list-timezones'
+  timezone: Europe/Brussels
+packages:
+  - tuned
+  - nfs-util
+  - htop
+  - saptune
+saptune_solution: Hana
+
+
+# disk-init role variables
+# please ensure that disk-order is the same on all servers
+disks:
+  /dev/sdc: vg_data
+  /dev/sdd: vg_log
+  /dev/sde: vg_shared
+volumes:
+  hana_data:
+    size: 100%FREE
+    vg: vg_data
+    mountpoint: /hana/data
+  hana_log:
+    size: 100%FREE
+    vg: vg_log
+    mountpoint: /hana/log
+  hana_shared:
+    size: 15G
+    vg: vg_shared
+    mountpoint: /hana/shared
+  usr_sap:
+    size: 7G
+    vg: vg_shared
+    mountpoint: /usr/sap
+
+#################################
+# SAP HANA DB  Settings - Host
+#################################
+
+# HANA DB
+instances:
+  GRC:
+    components: "client,server"
+    system_type: "Master"
+    instance_hostname: "{{ hostname }}"
+    sid: GRC
+    instance_number: 00
+    db_isolation: low
+    #root_password: grandconsult
+    sidadm_user_id: 2001
+    sidadm_group_id: 2003
+    sidadm_password: gc41DiData
+    system_password: gc41DiData
+    sapadm_password: gc41DiData
+    # Use values:  production | test | development | custom 
+    system_usage: development
+
+
+
+    
+    #####################
+    #  optional
+    #####################
+    # Install Hostagent y|n  - Default is n
+    #install_hostagent: y
+    # Install ssh keys  y|n - Default is y
+    #install_ssh_key: n
+
+    # Run the hdblcm in Check mode
+    check_only: n
+
+    # additional Paramters for the hdblcm
+    hdblcm_params:
+    
+    ######################
+    #   SCALE OUT
+    ######################
+    
+    # Host to add if isntallation is scale out
+    #addhosts:
+    
+    # On scale out systems /hana/shared musste be r/w by all hosts - Leave emty on scale up
+    #check_shared_mount:
+
+#################################
+# SAP HANA DB  Settings - Global
+#################################
+
+
+# Install media for HANA DB 
+# please deliver path which contains the unziped data 
+#fixme: change hana_installdir to softwaredest.path
+hana_installdir : "{{ software.dest.path }}"
+
+software:
+  source:
+    server: eulc-sv-sapdb03.ad.toyota-boshoku.be
+    path: /hana/instmedia/51052325-HANA-20-SPS2rev20/
+  dest:
+    path: /hana/instmedia/51052325
+
+
+# SAP Host Agent data
+# hostagent will be installed prior to SAP HANA DB installation
+agent: 
+  ssl_cert_password: "gc41DiData"
+  sapadm_useri_id: "2002"
+  shm_group_id: "2002"
+  sapsys_group_id: "2003"
+  sapadm_password: "gc41DiData"
+
