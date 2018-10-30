@@ -44,7 +44,7 @@
     - name: remove PXE template
       file:
         state: absent
-        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ interface.eth0.mac |regex_replace(':','-')|lower }"
+        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ interface.eth0.mac |regex_replace(':','-')|lower }}"
 
 - name: Wait for intallation to complete 
   wait_for_connection:
