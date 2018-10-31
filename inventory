@@ -5,18 +5,18 @@
 # To install use this Groupname
 ##############################################################################################
 
-[sol-prod:children]
-pxeserver
-solman-prod-saphana
+#[sol-prod:children]
+#pxeserver
+#solman-prod-saphana
 
 [sol-dev:children]
 pxeserver
 solman-dev-saphana
 
 
-[gcinst:children]
-pxeserver
-gctest-saphana
+#[gcinst:children]
+#pxeserver
+#gctest-saphana
 
 ##############################################################################################
 # This Group hosts the pxeserver

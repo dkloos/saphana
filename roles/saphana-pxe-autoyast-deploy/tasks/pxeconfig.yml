@@ -60,5 +60,5 @@
     sleep: 30
     delay: 180
     timeout: 2700
-  delegate_to: "{{ item.key }}.{{ item.value.domain }}"
-  with_dict: "{{ host }}"
+  delegate_to: "{{ item.host_to_install }}"
+  with_dict: "{{ pxeserver }}"
