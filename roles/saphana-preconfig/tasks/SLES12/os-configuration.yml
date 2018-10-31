@@ -40,7 +40,12 @@
     repo: '*'
     runrefresh: yes
 
-- name: " Stage 2.2 -  Install packages"
+- name: " Stage 2.2 -  Update installed packags"
+  zypper:
+    state: latest
+    name: '*'
+
+- name: " Stage 2.2 -  Install required packages"
   zypper:
     state: latest
     name: "{{ packages }}"

@@ -34,15 +34,15 @@
     vg: '{{ item.value }}'
     pvs: '{{ item.key }}'
     pesize: 32
+  when: ( disks is defined )
   with_dict: "{{ disks }}"
-  when: ( disks is defined ) 
   tags:
     - disk_init
 
 - name: " Stage 3 -   Create logical volumes"
   lvol:
     vg: "{{ item.value.vg }}"
-    lv: "lv_{{ item.key }}"
+    lv: "lv{{ item.key }}"
     size: "{{ item.value.size }}"
     state: present
     shrink: no
@@ -61,7 +61,7 @@
   ignore_errors: True
   tags:
     - disk_init
-  when: ( volumes is defined ) 
+  when: ( item.value.fstype is defined ) 
 
 - name: " Stage 3 -   Mount and make fstab entries"
   mount:
@@ -73,4 +73,4 @@
   with_dict: "{{ volumes }}"
   tags:
     - disk_init
-  when: ( volumes is defined ) 
+  when: ( item.value.mount is defined ) 
