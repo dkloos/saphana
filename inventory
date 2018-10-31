@@ -9,13 +9,13 @@
 # Only one installation group can be activated right now.
 ##############################################################################################
 
-#[sol-prod:children]
-#pxeserver
-#solman-prod-saphana
-
-[sol-dev:children]
+[sol-prod:children]
 pxeserver
-solman-dev-saphana
+solman-prod-saphana
+
+#[sol-dev:children]
+#pxeserver
+#solman-dev-saphana
 
 
 #[gcinst:children]
