@@ -61,3 +61,6 @@
     creates: "/usr/sap/{{ item.value.sid|upper }}/HDB{{ item.value.instance_number }}/exe/hdbdaemon"
   when: deployment_instance is defined
   with_dict: "{{ instances }}"
+
+
+#FIXME: Confiure SAP Hana Backup / DAA / SLD Reg / inital Backup? / SR ?

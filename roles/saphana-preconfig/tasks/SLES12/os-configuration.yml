@@ -39,6 +39,7 @@
   zypper_repository:
     repo: '*'
     runrefresh: yes
+###FIXME: Ensure that system reboots if new kernel are downlaoded here.
 
 - name: " Stage 2.2 -  Update installed packags"
   zypper:
