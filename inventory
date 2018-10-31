@@ -3,6 +3,10 @@
 ##############################################################################################
 # for installation create one group which includes the Group of the pxeserver and HANA DB
 # To install use this Groupname
+#
+#
+#  ATTENTION!!!!!!!!!!!!!!!!!!!
+# Only one installation group can be activated right now.
 ##############################################################################################
 
 #[sol-prod:children]
