@@ -1,5 +1,5 @@
 ---
-- name: Create File for Scale-Out Enviornments
+- name: " Stage 4.2 -   Create File for Scale-Out Enviornments"
   template:
     src: deployment_hanahosts_SID.conf.j2
     dest: /usr/local/bin/install_hana_{{ item.value.sid|lower }}.conf
@@ -8,43 +8,43 @@
 
 # Generate Template under Linux
 # ./hdbinst --dump_configfile_template=/tmp/test.cfg
-- name: copy installation answer file
+- name: " Stage 4.2 -   Copy installation answer file"
   template:
     src: deployment_hana_SID.cfg.j2
     dest: /tmp/hana_install_{{ item.value.sid|lower}}.cfg
   with_dict: "{{ instances }}"
 
-- name: create usr sap directory
+- name: " Stage 4.2 -   Create usr sap directory"
   file:
     path: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
   with_dict: "{{ instances }}"
 
-- name: create hana shared directory
+- name: " Stage 4.2 -  Create hana shared directory"
   file:
     path: "{{ volumes.hana_shared.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
   with_dict: "{{ instances }}"
 
-- name: create hana data directory
+- name: " Stage 4.2 -  Create hana data directory"
   file:
     path: "{{ volumes.hana_data.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
   with_dict: "{{ instances }}"
 
-- name: create hana log directory
+- name: " Stage 4.2 -  Create hana log directory"
   file:
     path: "{{ volumes.hana_log.mountpoint }}/{{ item.value.sid|upper }}"
     state: directory
   with_dict: "{{ instances }}"
 
-- name: create sap sid group
+- name: " Stage 4.2 -   Create sap sid group"
   group: 
     name: "{{ item.value.sid|lower }}shm"
     gid: "{{ item.value.sidadm_group_id }}"
   with_dict: "{{ instances }}"
 
-- name: create sap sid user
+- name: " Stage 4.2 -   Create sap sid user"
   user:
     name: "{{ item.value.sid|lower }}adm"
     uid: "{{ item.value.sidadm_user_id }}"
@@ -54,7 +54,7 @@
     password: "{{ item.value.sidadm_password|password_hash('sha512') }}"
   with_dict: "{{ instances }}"
 
-- name: "execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )"
+- name: " Stage 4.2 -  execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )"
   shell: ./hdblcm --configfile=/tmp/hana_install_{{ item.value.sid|lower}}.cfg -b --remote_execution=saphostagent {{ item.value.hdblcm_params| default('') }} >> /var/log/hana_install_{{ item.value.sid|lower}}.log
   args:
     chdir: "{{ hana_installdir }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"

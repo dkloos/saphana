@@ -1,0 +1,9 @@
+---
+- name: Ensure that variables are present
+  assert:
+    that:
+      - item.key is defined
+      - item.value.vg is defined
+      - item.value.size is defined
+  with_dict: "{{ volumes }}"
+

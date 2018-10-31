@@ -1,9 +1,10 @@
 ---
-- stat:
+- name: " Stage 2.1 -   Check if folder is present"
+  stat:
     path: "{{ hana_installdir }}"
   register: insdir
 
-- name: Copy installon folder from source
+- name: " Stage 2.1 -   Copy installation folder from source"
   block:
     - file:
         path: "{{ hana_installdir }}"
@@ -14,10 +15,10 @@
         dest: "{{ software.dest.path }}"
       delegate_to: "{{ software.source.server }}"
 
-- name: Get HANA Version Information
+- name: " Stage 2.1 -   Get HANA Version Information"
   shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ hana_installdir }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest
   register: hana_version
 
-- name: Make HANA Version persistent
+- name: " Stage 2.1 -   Make HANA Version persistent"
   set_fact: 
-  hana_version: hana_version.stdout
+    hana_version: hana_version.stdout

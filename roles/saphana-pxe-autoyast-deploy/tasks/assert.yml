@@ -1,0 +1,9 @@
+---
+- name: Ensure that variables are present
+  assert:
+    that: 
+      - item.key is defined 
+      - item.value.domain is defined
+      - item.value.interface.eth0.mac is defined
+      - pxeserver.host_to_install is defined
+  with_dict: "{{ host }}"

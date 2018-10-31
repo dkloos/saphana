@@ -1,0 +1,13 @@
+---
+- name: Ensure that variables are present
+  assert:
+    that: 
+      - item.key is defined 
+      - item.value.domain is defined
+      - item.value.interface.eth0.mac is defined
+      - packages is defined
+      - ntpserver.timezone is defined
+      - ntpserver.ip is defined
+      - saptune_solution is defined
+      - hana_installdir is defined
+  with_dict: "{{ host }}"

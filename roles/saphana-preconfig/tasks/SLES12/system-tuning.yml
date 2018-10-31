@@ -1,5 +1,5 @@
 ---
-- name: setting kernel tunables
+- name: " Stage 2.3 -   Setting kernel tunables"
   sysctl: name={{ item.name }} value={{ item.value }} state=present sysctl_set=yes reload=yes
   with_items:
 #SAP Note: https://launchpad.support.sap.com/#/notes/2382421
@@ -10,15 +10,15 @@
     - { name: net.ipv4.tcp_slow_start_after_idle, value: 0 }
 
 # SAP Note: https://launchpad.support.sap.com/#/notes/1275776
-- name: activate saptune 
+- name: " Stage 2.3 -   Activate saptune"
   shell: saptune daemon start
 
-- name: activate saptune
+- name: " Stage 2.3 -   Apply saptune profile"
   shell: "saptune solution apply {{ saptune_solution }}"
   ignore_errors: yes
 
 #SAP Note: https://launchpad.support.sap.com/#/notes/2205917
-- name: disable intel c states in grub config (RHEL 7)
+- name: " Stage 2.3 -   Disable intel c states in grub config"
   lineinfile: 
     dest: /etc/default/grub 
     line: GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 numa_balancing=disable"

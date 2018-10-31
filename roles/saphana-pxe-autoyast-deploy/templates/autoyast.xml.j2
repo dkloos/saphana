@@ -66,8 +66,8 @@
     <dns>
       <dhcp_hostname config:type="boolean">true</dhcp_hostname>
       
-      <domain>{{ domain }}</domain>
-      <hostname>{{ hostname }}</hostname>
+      <domain>{{ item.value.domain }}</domain>
+      <hostname>{{ item.key }}</hostname>
       <nameservers config:type="list">
 {% for item in nameserver %}
         <nameserver>{{ item }}</nameserver>
@@ -75,14 +75,14 @@
       </nameservers>
       <resolv_conf_policy>auto</resolv_conf_policy>
       <searchlist config:type="list">
-{% for item in domain %}
+{% for item in item.value.domain %}
         <search>{{ item }}</search>
 {% endfor %}
       </searchlist>
       <write_hostname config:type="boolean">false</write_hostname>
     </dns>
     <interfaces config:type="list">
-{% for itemname, item in interface.iteritems() %}
+{% for itemname, item in item.value.interface.iteritems() %}
 {% if item.ip is defined %}
       <interface>
         <bootproto>static</bootproto>
@@ -115,7 +115,7 @@
       <ipv4_forward config:type="boolean">false</ipv4_forward>
       <ipv6_forward config:type="boolean">false</ipv6_forward>
       <routes config:type="list">
-{% for itemname, item in interface.iteritems() %}
+{% for itemname, item in item.value.interface.iteritems() %}
 {% if item.gateway is defined %}
        <route>
           <destination>default</destination>

@@ -1,5 +1,5 @@
 ---
-- name: Esnure packages required are present
+- name: " Stage 3 -   Ensure packages required are present"
   zypper:
     name: "{{ item }}"
     state: present
@@ -11,7 +11,7 @@
     - disk_init
 
 ## Return Value of failed rescan command not yet tested
-- name: rescanning for new disks
+- name: " Stage 3 -    Rescanning for new disks"
   shell: |
    new_disk=0
    if [ ! -b {{ item.key }} ]; then
@@ -29,7 +29,7 @@
   tags:
     - disk_init
 
-- name: create disk partitions 
+- name: " Stage 3 -   Create disk partitions"
   lvg:
     vg: '{{ item.value }}'
     pvs: '{{ item.key }}'
@@ -39,7 +39,7 @@
   tags:
     - disk_init
 
-- name: create logical volumes
+- name: " Stage 3 -   Create logical volumes"
   lvol:
     vg: "{{ item.value.vg }}"
     lv: "lv_{{ item.key }}"
@@ -51,7 +51,7 @@
   tags:
     - disk_initA
 
-- name: create filesystems
+- name: " Stage 3 -   Create filesystems"
   filesystem:
     dev:  /dev/{{ item.value.vg}}/lv_{{ item.key }}
     fstype: "{{ item.value.fstype | default('xfs') }}"
@@ -63,7 +63,7 @@
     - disk_init
   when: ( volumes is defined ) 
 
-- name: mount and make fstab entries
+- name: " Stage 3 -   Mount and make fstab entries"
   mount:
     name: "{{ item.value.mountpoint }}"
     fstype: "{{ item.value.fstype | default('xfs') }}"

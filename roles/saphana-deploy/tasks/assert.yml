@@ -1,0 +1,14 @@
+---
+- name: Ensure that variables are present
+  assert:
+    that:
+      - item.key is defined
+      - item.value.sid is defined
+      - item.value.components is defined
+      - item.value.instance_number is defined
+      - item.value.instance_hostname is defined
+      - item.value.sidadm_password is defined
+      - item.value.system_password is defined
+      - item.value.system_usage is defined
+  with_dict: "{{ instances }}"
+

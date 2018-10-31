@@ -3,5 +3,10 @@
 # This role will create LVM Volumes for Hana if defined
 # ######################################################
 
-- include: disk-init.yml
+- include_tasks: ./assert.yml
+
+- debug:
+   msg: "######################     Stage 3 -  Creating LVM Volumes   ######################"
+
+- include_tasks: disk-init.yml
   when: not( (disks is undefined) or (disks is none) or (disks | trim == '') )

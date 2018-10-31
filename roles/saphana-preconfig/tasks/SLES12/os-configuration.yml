@@ -1,21 +1,23 @@
 ---
-- name: check / set hostname
+- name: " Stage 2.2 -   Check / set hostname"
   hostname:
-    name: "{{ hostname }}"
+    name: "{{ item.key }}"
+  with_dict: "{{ host }}"
 
-- name: setting correct hostname in /etc/hosts
+- name: " Stage 2.2 -   Setting correct hostname in /etc/hosts"
   lineinfile:
     path: /etc/hosts
-    regexp: "{{ hostname }}"
-    line: "{{ interface.eth0.ip }}  {{ hostname }}.{{ domain }}  {{ hostname }}"
+    regexp: "{{ item.key }}"
+    line: "{{ item.value.interface.eth0.ip }}  {{ item.key }}.{{ item.value.domain }}  {{ item.key }}"
+  with_dict: "{{ host }}"
 
-- name: setting DNS config
+- name: " Stage 2.2 -   Setting DNS config"
   lineinfile:
     path: /etc/resolv.conf
     line: "nameserver {{ item }}"
   with_items: "{{ nameserver }}"
 
-- name: remove DVD repo
+- name: " Stage 2.2 -  Remove DVD repo"
   zypper_repository:
     state: absent
     name: 'SLE-12-SP3-SAP-12.3-0'
@@ -28,21 +30,22 @@
 #  register: regstatus
 #  when: not ( (registration.regcode is undefined) or (registration.regcode is undefined is none) or (registration.regcode is undefined | trim == '') or (registration.email is undefined) or (registration.email is undefined is none) or (registration.email is undefined | trim == '') )
 
-- name: register system
-  shell: "SUSEConnect -r {{ registration.regcode }} -e {{ registration.email }}"
+- name: " Stage 2.2 -   Register system"
+  shell: "SUSEConnect -r {{ item.value.registration.regcode }} -e {{ item.value.registration.email }}"
+  with_dict: "{{ host }}"
  # when: regstatus.value != "Not Registered"
 
-- name: refresh all repos
+- name: " Stage 2.2 -   Refresh all repos"
   zypper_repository:
     repo: '*'
     runrefresh: yes
 
-- name: install packages
+- name: " Stage 2.2 -  Install packages"
   zypper:
     state: latest
     name: "{{ packages }}"
 
-- name: setting NTP server
+- name: " Stage 2.2 -   Setting NTP server"
   block:
    - lineinfile:
        path: /etc/ntp.conf
@@ -50,34 +53,18 @@
      notify: restart ntp
    - timezone:
        name: "{{ ntpserver.timezone }}"
-   - service:
-       name: ntpd
-       state: started
-       enabled: true
   when: not( (ntpserver is undefined) or (ntpserver is none) or (ntpserver | trim == '') )
 
 
 ### TODO: Configure Firewall according to instance number instead of disabling
-- name: disable firewalld
+- name: " Stage 2.2 -  Configure Services"
   service: 
-    name: SuSEfirewall2
-    state: stopped
-    enabled: no
-
-- name: disable kdump
-  service: 
-    name: kdump
-    state: stopped
-    enabled: no
-
-- name: enable tuned
-  service: 
-    name: uuidd
-    state: started 
-    enabled: yes
-
-- name: enable tuned
-  service: 
-    name: tuned 
-    state: started 
-    enabled: yes
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    enabled: "{{ item.enabled }}"
+  with_items:
+    - { name: 'SuSEfirewall2', state: 'stopped', enabled: 'no' }
+    - { name: 'kdump', state: 'stopped', enabled: 'no' }
+    - { name: 'uuidd', state: 'started', enabled: 'yes' }
+    - { name: 'tuned', state: 'started', enabled: 'yes' }
+    - { name: 'ntpd', state: 'started', enabled: 'yes' }

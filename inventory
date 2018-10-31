@@ -1,11 +1,38 @@
+
+
+##############################################################################################
+# for installation create one group which includes the Group of the pxeserver and HANA DB
+# To install use this Groupname
+##############################################################################################
+
+[sol-prod:children]
+pxeserver
+solman-prod-saphana
+
+[sol-dev:children]
+pxeserver
+solman-dev-saphana
+
+
+[gcinst:children]
+pxeserver
+gctest-saphana
+
+##############################################################################################
+# This Group hosts the pxeserver
+##############################################################################################
 [pxeserver]
 localhost ansible_connection=local
 
+##############################################################################################
+# Create one Group vor each Server
+# Groups must end with "-saphana"
+##############################################################################################
 [gctest-saphana]
 192.168.207.51
 
-#[solman-prod-saphana]
-#192.168.207.35
+[solman-prod-saphana]
+192.168.207.35
 
-#[solman-dev-saphana]
-#192.168.207.34
+[solman-dev-saphana]
+192.168.207.34
