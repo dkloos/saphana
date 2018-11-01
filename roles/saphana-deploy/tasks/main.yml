@@ -8,9 +8,30 @@
 - debug:
    msg: "######################     Stage 4 -  Deploy SAP Hana DB   ######################"
 
+#- name " Stage 4 -   Checking if HANA Instance is already installed"
+- block:
+    - name: " Stage 4 -  Copy check script"
+      template:
+        src: HDB_check/check_hana_status.sh.j2
+        dest: /usr/sap/check_hana_status.sh
+        mode: 0755
+      no_log: true
+      with_dict: "{{ instances }}"
+    - name: " Stage 4 -   Execute check"
+      shell: /usr/sap/check_hana_status.sh
+      register: hdbstatus
+      changed_when: false
+      no_log: true
+      ignore_errors: yes
+
+- debug:
+   msg: "######################     HANA DB already deployed - Skipping Installation  ######################"
 
 - include_tasks: ./hostagent.yml
+  when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))
+
 - include_tasks: ./deployment.yml
+  when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))
   tags:
     - hana-install
 

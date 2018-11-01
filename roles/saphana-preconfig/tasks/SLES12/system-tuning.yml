@@ -12,10 +12,11 @@
 # SAP Note: https://launchpad.support.sap.com/#/notes/1275776
 - name: " Stage 2.3 -   Activate saptune"
   shell: saptune daemon start
+  changed_when: false
 
 - name: " Stage 2.3 -   Apply saptune profile"
   shell: "saptune solution apply {{ saptune_solution }}"
-  ignore_errors: yes
+  changed_when: false
 
 #SAP Note: https://launchpad.support.sap.com/#/notes/2205917
 - name: " Stage 2.3 -   Disable intel c states in grub config"

@@ -23,17 +23,19 @@
     name: 'SLE-12-SP3-SAP-12.3-0'
 
 ########################
-# Fix me Suse registration
+# FIXME:  Suse registration
 ##########################
-#- name: check regitered status
-#  shell: SUSEConnect -s |awk -F: '{print  $5}'| cut -d \" -f2
-#  register: regstatus
+- name: check regitered status
+  shell: SUSEConnect -s
+  register: regstatus
 #  when: not ( (registration.regcode is undefined) or (registration.regcode is undefined is none) or (registration.regcode is undefined | trim == '') or (registration.email is undefined) or (registration.email is undefined is none) or (registration.email is undefined | trim == '') )
+  changed_when: false
 
 - name: " Stage 2.2 -   Register system"
   shell: "SUSEConnect -r {{ item.value.registration.regcode }} -e {{ item.value.registration.email }}"
   with_dict: "{{ host }}"
- # when: regstatus.value != "Not Registered"
+  when: ("Not Registered" in regstatus.stdout)
+
 
 - name: " Stage 2.2 -   Refresh all repos"
   zypper_repository:

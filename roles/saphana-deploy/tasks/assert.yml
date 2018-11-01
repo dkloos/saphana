@@ -10,5 +10,6 @@
       - item.value.sidadm_password is defined
       - item.value.system_password is defined
       - item.value.system_usage is defined
+  no_log: true
   with_dict: "{{ instances }}"
 

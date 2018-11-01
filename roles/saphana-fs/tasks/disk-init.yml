@@ -61,7 +61,6 @@
   ignore_errors: True
   tags:
     - disk_init
-  when: ( item.value.fstype is defined ) 
 
 - name: " Stage 3 -   Mount and make fstab entries"
   mount:

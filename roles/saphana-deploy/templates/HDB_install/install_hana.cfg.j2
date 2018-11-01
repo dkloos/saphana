@@ -79,7 +79,7 @@ storage_cfg={{ item.value.storage_cfg | default('') }}
 internal_network={{ item.value.internal_network | default('') }}
 
 # Location of Data Volumes ( Default: ${sapmnt}/${sid}/global/hdb/data )
-datapath={{ volumes.data_path | default ('/hana/log/${sid}') }}
+datapath={{ item.value.data_path | default ('/hana/data/${sid}') }}
 
 # Location of Log Volumes ( Default: ${sapmnt}/${sid}/global/hdb/log )
 logpath={{ item.value.log_path | default ('/hana/log/${sid}') }}
@@ -103,23 +103,4 @@ system_user_password={{ item.value.system_password }}
 autostart={{ item.value.autostart | default('n') }}
 
 # Enable HANA repository ( Default: y )
-repository={{ item.value.repository | default('y') }}
-
-# Inter Service Communication Mode ( Valid values: standard | ssl )
-isc_mode={{ item.value.isc_mode | default('') }}
-
-# Enable XS Engine ( Default: y )
-xs_engine={{ item.value.xs_engine | default('y') }}
-
-# XS Engine HTTP Port
-xs_engine_http_port={{ item.value.xs_engine_http_port | default('') }}
-
-# XS Engine HTTPS Port
-xs_engine_https_port={{ item.value.xs_engine_https_port | default('') }}
-
-# Imports delivery units ( Default: y )
-import_content={{ item.value.import_content | default('y') }}
-
-# Do not Modify '/etc/sudoers' File ( Default: n )
-skip_modify_sudoers=n
-
+???LINES MISSING

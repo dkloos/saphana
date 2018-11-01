@@ -9,6 +9,7 @@
    msg: "######################     Stage 1 -  Creating PXE config   ######################"
 - name: " Stage 1 -  Ping Test"
   local_action: "shell ping -q -c 1 -W 1 {{ pxeserver.host_to_install }}"
+  changed_when: false
   ignore_errors: yes
   register: ping_result
    

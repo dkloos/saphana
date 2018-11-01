@@ -1,0 +1,154 @@
+#!/bin/bash
+## GLOBALS
+SID="{{ item.value.sid }}"
+InstanceNr="{{ item.value.instance_number }}"
+SAPVIRHOST="{{ item.value.instance_hostname }}"
+SIDInstanceName="${SID}_HDB${InstanceNr}"
+InstanceName="HDB${InstanceNr}"
+sid=$(echo "$SID" | tr [:upper:] [:lower:])
+sidadm="${sid}adm"
+DIR_EXECUTABLE=""
+SH=/bin/sh
+DIR_EXECUTABLE="/usr/sap/$SID/$InstanceName/exe"
+SAPSTARTSRV="$DIR_EXECUTABLE/sapstartsrv"
+SAPCONTROL="$DIR_EXECUTABLE/sapcontrol"
+DIR_PROFILE="${OCF_RESKEY_DIR_PROFILE:-/usr/sap/$SID/SYS/profile}"
+SAPSTARTPROFILE="$DIR_PROFILE/${OCF_RESKEY_INSTANCE_PROFILE:-${SID}_${InstanceName}_${SAPVIRHOST}}"
+
+#
+# function: saphana_check_local_instance
+# params:
+# output:
+# rc:       rc=0 (UP) rc=1 (DOWN)
+# globals:
+#
+function saphana_check_local_instance()
+{
+    local rc=1
+    local count=0
+    local SERVNO
+    local output
+    local MONITOR_SERVICES="hdbnameserver|hdbdaemon" # TODO: PRIO1: exact list of Services
+    check_sapstartsrv
+    rc=$?
+    if [ $rc -eq 0 ]
+    then
+      output=$($SAPCONTROL -nr $InstanceNr -function GetProcessList -format script)
+      # we have to parse the output, because the returncode doesn't tell anything about the instance status
+      for SERVNO in `echo "$output" | grep '^[0-9] ' | cut -d' ' -f1 | sort -u`
+      do
+        local COLOR=`echo "$output" | grep "^$SERVNO dispstatus: " | cut -d' ' -f3`
+        local SERVICE=`echo "$output" | grep "^$SERVNO name: " | cut -d' ' -f3`
+        local STATE=0
+        local SEARCH
+
+        case $COLOR in
+          GREEN|YELLOW)       STATE=0;;
+          *)                  STATE=1;;
+        esac
+
+        SEARCH=`echo "$MONITOR_SERVICES" | sed 's/\+/\\\+/g' | sed 's/\./\\\./g'`
+        if [ `echo "$SERVICE" | egrep -c "$SEARCH"` -eq 1 ]
+        then
+          if [ $STATE -eq 1 ]
+          then
+            echo "SAP instance service $SERVICE status color is $COLOR !"
+            rc=$STATE
+          fi
+          count=1
+        fi
+      done
+
+      if [ $count -eq 0 -a $rc -eq 0 ]
+      then
+        if ocf_is_probe
+        then
+          rc=1
+        else
+          echo "The SAP instance does not run any services!"
+          rc=1
+        fi
+      fi
+    fi
+    echo "FLOW $FUNCNAME rc=$rc"
+    return $rc
+}
+
+#
+# function: check_sapstartsrv - check for sapstartsrv - optional start
+# params:   -
+# globals:  DIR_PROFILE(w), SAPSTARTPROFILE(r), SAPCONTROL(r), SID(r), InstanceName(r), InstanceNr(r), OCF_*(r)
+# check_sapstartsrv : Before using sapcontrol we make sure that the sapstartsrv is running.
+#
+function check_sapstartsrv() {
+    local restart=0
+    local runninginst=""
+    local rc=0
+    local output=""
+    if [ ! -S /tmp/.sapstream5${InstanceNr}13 ]; then
+        echo "sapstartsrv is not running for instance $SID-$InstanceName, it will be started now"
+        restart=1
+    else
+        output=$($SAPCONTROL -nr $InstanceNr -function ParameterValue INSTANCE_NAME -format script)
+        if [ $? -eq 0 ]
+        then
+            runninginst=$(echo "$output" | grep '^0 : ' | cut -d' ' -f3)
+            if [ "$runninginst" != "$InstanceName" ]
+            then
+                echo "sapstartsrv is running for instance $runninginst, that service will be killed"
+                restart=1
+            else
+                output=$($SAPCONTROL -nr $InstanceNr -function AccessCheck Start)
+                if [ $? -ne 0 ]; then
+                    echo "FAILED - sapcontrol -nr $InstanceNr -function AccessCheck Start ($(ls -ld1 /tmp/.sapstream5${InstanceNr}13))"
+                    echo "sapstartsrv will be restarted to try to solve this situation, otherwise please check sapstsartsrv setup (SAP Note 927637)"
+                    restart=1
+                fi
+            fi
+        else
+            echo "sapstartsrv is not running for instance $SID-$InstanceName, it will be started now"
+            restart=1
+        fi
+    fi
+    if [ -z "$runninginst" ]; then runninginst=$InstanceName; fi
+    if [ $restart -eq 1 ]
+
+    then
+        if [ -d /usr/sap/$SID/SYS/profile/ ]
+        then
+            DIR_PROFILE="/usr/sap/$SID/SYS/profile"
+        else
+           echo "Expected /usr/sap/$SID/SYS/profile/ to be a directory, please set DIR_PROFILE parameter!"
+        fi
+        [ ! -r $SAPSTARTPROFILE ]
+        pkill -9 -f "sapstartsrv.*$runninginst"
+        # removing the unix domain socket files as they might have wrong permissions
+        # or ownership - they will be recreated by sapstartsrv during next start
+        rm -f /tmp/.sapstream5${InstanceNr}13
+        rm -f /tmp/.sapstream5${InstanceNr}14
+        (
+          export PATH="$DIR_EXECUTABLE${PATH:+:}$PATH"
+          export LD_LIBRARY_PATH="$DIR_EXECUTABLE${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
+          $SAPSTARTSRV pf=$SAPSTARTPROFILE -D -u $sidadm
+        )
+        # now make sure the daemon has been started and is able to respond
+        local srvrc=1
+        while [ $srvrc -eq 1 -a $(pgrep -f "sapstartsrv.*$runninginst" | wc -l) -gt 0 ]
+        do
+            sleep 1
+            $SAPCONTROL -nr $InstanceNr -function GetProcessList > /dev/null 2>&1
+            srvrc=$?
+        done
+        if [ $srvrc -ne 1 ]
+        then
+            echo "sapstartsrv for instance $SID-$InstanceName was restarted!"
+            rc=0
+        else
+            echo "sapstartsrv for instance $SID-$InstanceName could not be started!"
+            rc=$OCF_ERR_GENERIC
+            rc=1
+        fi
+    fi
+    return $rc
+}
+saphana_check_local_instance

@@ -20,23 +20,19 @@
     uid: "{{ agent.sapadm_useri_id }}"
     group: sapsys
     password: "{{ agent.sapadm_password | password_hash('sha512') }}"
-
-#- name: " Stage 4.1 -   Installation File SAP HANA Host Agent"
-#  template: 
-#    src: preconfigure_sap_install_saphostagent.sh.j2 
-#    dest: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
-#    mode: 0755
+  changed_when: false
 
 - name: " Stage 4.1 -   Installation File SAP HANA Host Agent"
   template:
-    src: preconfigure_sap_install_saphostagent.sh.j2
-    dest: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
+    src: hostagent_install/install_saphostagent.sh.j2
+    dest: /usr/local/bin/install_saphostagent.sh
     mode: 0755
 
 - name: " Stage 4.1 -   Install SAP HANA Host Agent"
-  shell: /usr/local/bin/preconfigure_sap_install_saphostagent.sh
+  shell: /usr/local/bin/install_saphostagent.sh
   args:
-  creates: /usr/sap/hostctrl/exe/saphostexec
+#  creates: /usr/sap/hostctrl/exe/saphostexec
+  changed_when: false
 
 # Setup sap hana Hostagent SSL
 # http://help.sap.com/saphelp_nw73ehp1/helpdata/en/8d/12f7b9244b44219bd14d619d3a2123/content.htm
@@ -51,16 +47,17 @@
 
 - name: " Stage 4.1 -   Deployfile for HANA Host Agent SSL Configuration"
   template: 
-    src: preconfigure_sap_install_sslforsaphostagent.sh.j2
-    dest: /usr/local/bin/preconfigure_sap_install_sslforsaphostagent.sh
+    src: hostagent_install/install_sslforsaphostagent.sh.j2
+    dest: /usr/local/bin/install_sslforsaphostagent.sh
     mode: 0755
   with_dict: "{{ host }}"
 
 - name: " Stage 4.1 -   Ensure SSL is configured for saphostagent"
-  shell: /usr/local/bin/preconfigure_sap_install_sslforsaphostagent.sh
+  shell: /usr/local/bin/install_sslforsaphostagent.sh
   notify: "Restart HostAgent"
   args:
-  creates: /usr/sap/hostctrl/exe/sec/SAPSSLS.pse 
+#  creates: /usr/sap/hostctrl/exe/sec/SAPSSLS.pse 
+  changed_when: false
 
 - name: " Stage 4.1 -   Change user for SAPSSLS.pse file for SAP Host Agent"
   file:

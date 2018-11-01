@@ -1,8 +1,7 @@
 #!/bin/bash
-# Check if puppet variable is filled
 if [ "{{ instance.value.sid |lower }}" ]; then
- # Check if hana install filed extists
- # Please change to real hana install test!
+ # Check if hana install file extists
+ #FIXME: Please change to real hana install test!
  if [ ! -f "/hana/shared/hana_installed_{{ instance.value.sid |lower }}.txt" ]; then
   #  Get all Members of the Cluster deployed over puppet
   for i in $(cat /usr/local/bin/install_hana_{{ instance.value.sid |lower }}.conf | sed "s/,/ /g"); do
@@ -18,7 +17,7 @@ if [ "{{ instance.value.sid |lower }}" ]; then
   ./hdblcm --ignore=check_signature_file --configfile=/tmp/hana_inst_{{ instance.value.sid|lower }}.cfg -b --remote_execution=saphostagent >> /var/log/hana_install.log
  fi
 else
- echo "Error, no SAPSYSTEMNAME_SMALL!"
+ echo "Error, please define variable for SID"
  exit 1
 fi
 
