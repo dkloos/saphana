@@ -41,12 +41,28 @@
   zypper_repository:
     repo: '*'
     runrefresh: yes
-###FIXME: Ensure that system reboots if new kernel are downlaoded here.
 
 - name: " Stage 2.2 -  Update installed packags"
   zypper:
     state: latest
     name: '*'
+
+#FIXME: Ensure that system reboots if new kernel are downlaoded here.
+#- shell: if [ $(zypper if kernel-default |grep Version |cut -d':' -f2|cut -d'-' -f1|tr -d ' ') > $(uname -r |cut -d'-' -f1) ];then echo "reboot"; fi
+#  changed_when: false
+#  register: compair_kernel
+  
+#- name: " Stage 2.2 -  Restart system to reboot to newest kernel"
+#  shell: "sleep 5 && /sbin/shutdown -r now"
+#  async: 1
+#  poll: 0
+#  when: (compair_kernel.stdout == "reboot")
+
+#- name: " Stage 2.2 -  Wait for system to become reachable again"
+#  wait_for_connection:
+#    delay: 60
+#    timeout: 300
+#  when: (compair_kernel.stdout == "reboot")
 
 - name: " Stage 2.2 -  Install required packages"
   zypper:

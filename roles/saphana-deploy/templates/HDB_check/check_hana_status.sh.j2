@@ -71,6 +71,7 @@ function saphana_check_local_instance()
       fi
     fi
     echo "FLOW $FUNCNAME rc=$rc"
+#    /usr/sap/hostctrl/exe/saphostexec -stop
     return $rc
 }
 

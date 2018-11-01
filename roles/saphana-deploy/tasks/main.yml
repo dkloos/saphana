@@ -21,11 +21,12 @@
       shell: /usr/sap/check_hana_status.sh
       register: hdbstatus
       changed_when: false
-      no_log: true
+#      no_log: true
       ignore_errors: yes
 
 - debug:
    msg: "######################     HANA DB already deployed - Skipping Installation  ######################"
+  when: ('rc=0'  in hdbstatus.stdout)
 
 - include_tasks: ./hostagent.yml
   when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))

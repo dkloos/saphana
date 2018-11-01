@@ -61,7 +61,7 @@
   args:
     chdir: "{{ hana_installdir }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"
     creates: "/usr/sap/{{ item.value.sid|upper }}/HDB{{ item.value.instance_number }}/exe/hdbdaemon"
-  when: ((deployment_instance is defined)
+  when: (deployment_instance is defined)
   with_dict: "{{ instances }}"
 
 
