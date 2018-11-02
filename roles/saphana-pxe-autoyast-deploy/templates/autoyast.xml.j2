@@ -66,27 +66,27 @@
     <dns>
       <dhcp_hostname config:type="boolean">true</dhcp_hostname>
       
-      <domain>{{ item.value.domain }}</domain>
-      <hostname>{{ item.key }}</hostname>
+      <domain>{{ item.domain }}</domain>
+      <hostname>{{ item.name }}</hostname>
       <nameservers config:type="list">
-{% for item in nameserver %}
+{% for item in item.nameserver %}
         <nameserver>{{ item }}</nameserver>
 {% endfor %}
       </nameservers>
       <resolv_conf_policy>auto</resolv_conf_policy>
       <searchlist config:type="list">
-{% for item in item.value.domain %}
+{% for item in item.domain %}
         <search>{{ item }}</search>
 {% endfor %}
       </searchlist>
       <write_hostname config:type="boolean">false</write_hostname>
     </dns>
     <interfaces config:type="list">
-{% for itemname, item in item.value.interface.iteritems() %}
-{% if item.ip is defined %}
+{% for itemkey,item in item.interface.items %}
+{% if item.value.ip is defined %}
       <interface>
         <bootproto>static</bootproto>
-        <device>{{ itemname }}</device>
+        <device>{{ item.name }}</device>
         <ipaddr>{{ item.ip }}</ipaddr>			   
         <name>VMXNET3 Ethernet Controller</name>
         <netmask>{{ item.mask }}</netmask>
@@ -115,11 +115,11 @@
       <ipv4_forward config:type="boolean">false</ipv4_forward>
       <ipv6_forward config:type="boolean">false</ipv6_forward>
       <routes config:type="list">
-{% for itemname, item in item.value.interface.iteritems() %}
+{% for itemkey,item in item.interface.items() %}
 {% if item.gateway is defined %}
        <route>
           <destination>default</destination>
-          <device>{{ itemname }}</device>
+          <device>{{ item.name }}</device>
           <gateway>{{ item.gateway }}</gateway>
           <netmask>-</netmask>
        </route>
@@ -154,7 +154,7 @@
   </scripts>
   <timezone>
     <hwclock>UTC</hwclock>
-    <timezone>{{ ntpserver.timezone }}</timezone>
+    <timezone>{{ host.ntpserver.timezone }}</timezone>
   </timezone>
   <groups config:type="list">
     <group>
@@ -199,7 +199,7 @@
       </password_settings>
       <shell>/bin/bash</shell>
       <uid>0</uid>
-      <user_password>{{ root_password_hash }}</user_password>
+      <user_password>{{ host.root_password_hash }}</user_password>
       <username>root</username>
     </user>
   </users>
@@ -424,7 +424,7 @@
         <file_permissions>644</file_permissions>
         <file_contents>
 <![CDATA[
-{% for item in ssh_keys_root_access %}
+{% for item in host.ssh_keys_root_access %}
 {{ item }}
 {% endfor %}
 ]]>

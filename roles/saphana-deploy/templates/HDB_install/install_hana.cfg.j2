@@ -7,7 +7,7 @@ skip_hostagent_calls=n
 check_only={{ item.value.check_only | default('n') }}
 
 # Remote Execution ( Default: ssh; Valid values: ssh | saphostagent )
-remote_execution=ssh
+remote_execution={{ item.value.remote_execution | default('ssh') }}
 
 # Enable the installation or upgrade of the SAP Host Agent ( Default: n )
 install_hostagent={{ item.value.install_hostagent | default('y') }}
@@ -103,4 +103,4 @@ system_user_password={{ item.value.system_password }}
 autostart={{ item.value.autostart | default('n') }}
 
 # Enable HANA repository ( Default: y )
-???LINES MISSING
+???LINES MISSING# Restart system after machine reboot? ( Default: n 

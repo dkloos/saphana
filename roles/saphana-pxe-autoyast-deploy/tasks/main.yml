@@ -8,7 +8,7 @@
 - debug:
    msg: "######################     Stage 1 -  Creating PXE config   ######################"
 - name: " Stage 1 -  Ping Test"
-  local_action: "shell ping -q -c 1 -W 1 {{ pxeserver.host_to_install }}"
+  local_action: "shell ping -q -c 1 -W 1 {{ host.interface.public.ip }}"
   changed_when: false
   ignore_errors: yes
   register: ping_result
@@ -17,5 +17,5 @@
   when: ('100% packet loss' in ping_result.stdout)
 
 - debug:
-    msg: " Skipping PXE boot - System IP {{ pxeserver.host_to_install }} is reachable"
+    msg: " Skipping PXE boot - System IP {{ host.interface.public.ip }} is reachable"
   when: ('100% packet loss' in ping_result.stdout)

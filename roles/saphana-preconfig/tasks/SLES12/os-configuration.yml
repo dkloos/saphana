@@ -1,21 +1,21 @@
 ---
 - name: " Stage 2.2 -   Check / set hostname"
   hostname:
-    name: "{{ item.key }}"
+    name: "{{ item.name }}"
   with_dict: "{{ host }}"
 
 - name: " Stage 2.2 -   Setting correct hostname in /etc/hosts"
   lineinfile:
     path: /etc/hosts
-    regexp: "{{ item.key }}"
-    line: "{{ item.value.interface.eth0.ip }}  {{ item.key }}.{{ item.value.domain }}  {{ item.key }}"
+    regexp: "{{ item.name }}"
+    line: "{{ item.interface.public.ip }}  {{ item.name }}.{{ item.domain }}  {{ item.name }}"
   with_dict: "{{ host }}"
 
 - name: " Stage 2.2 -   Setting DNS config"
   lineinfile:
     path: /etc/resolv.conf
-    line: "nameserver {{ item }}"
-  with_items: "{{ nameserver }}"
+    line: "item.nameserver {{ item }}"
+  with_items: "{{ item.nameserver }}"
 
 - name: " Stage 2.2 -  Remove DVD repo"
   zypper_repository:
@@ -32,7 +32,7 @@
   changed_when: false
 
 - name: " Stage 2.2 -   Register system"
-  shell: "SUSEConnect -r {{ item.value.registration.regcode }} -e {{ item.value.registration.email }}"
+  shell: "SUSEConnect -r {{ host.registration.regcode }} -e {{ host.registration.email }}"
   with_dict: "{{ host }}"
   when: ("Not Registered" in regstatus.stdout)
 
@@ -67,17 +67,22 @@
 - name: " Stage 2.2 -  Install required packages"
   zypper:
     state: latest
-    name: "{{ packages }}"
+    name: "{{ item }}"
+  with_items:
+    - tuned
+    - nfs-utils
+    - saptune
+    - uuidd
 
 - name: " Stage 2.2 -   Setting NTP server"
   block:
    - lineinfile:
        path: /etc/ntp.conf
-       line: "server {{ ntpserver.ip }}"
+       line: "server {{ host.ntpserver }}"
      notify: restart ntp
    - timezone:
-       name: "{{ ntpserver.timezone }}"
-  when: not( (ntpserver is undefined) or (ntpserver is none) or (ntpserver | trim == '') )
+       name: "{{ host.timezone }}"
+  when: not( (host.ntpserver is undefined) or (host.ntpserver is none) or (host.ntpserver | trim == '') )
 
 
 ### TODO: Configure Firewall according to instance number instead of disabling

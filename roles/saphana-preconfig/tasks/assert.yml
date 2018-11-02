@@ -2,12 +2,13 @@
 - name: Ensure that variables are present
   assert:
     that: 
-      - item.key is defined 
-      - item.value.domain is defined
+      - item.name is defined 
+      - item.domain is defined
       - item.value.interface.eth0.mac is defined
-      - packages is defined
-      - ntpserver.timezone is defined
-      - ntpserver.ip is defined
-      - saptune_solution is defined
-      - hana_installdir is defined
+      - item.ntpserver is defined
+      - item.timezone is defined
+      - item.saptune_solution is defined
+      - software.source.server is defined
+      - software.source.path is defined
+      - software.source.dest is defined
   with_dict: "{{ host }}"

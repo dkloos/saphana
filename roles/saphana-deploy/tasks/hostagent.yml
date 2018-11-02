@@ -12,14 +12,14 @@
 - name: " Stage 4.1 -   Create sapsys group"
   group: 
     name: sapsys 
-    gid: "{{ agent.sapadm_useri_id }}"
+    gid: "{{ hostagent.sapadm_useri_id }}"
 
 - name: " Stage 4.1 -   Create sapadm user"
   user:
     name: sapadm
-    uid: "{{ agent.sapadm_useri_id }}"
+    uid: "{{ hostagent.sapadm_useri_id }}"
     group: sapsys
-    password: "{{ agent.sapadm_password | password_hash('sha512') }}"
+    password: "{{ hostagent.sapadm_password | password_hash('sha512') }}"
   changed_when: false
 
 - name: " Stage 4.1 -   Installation File SAP HANA Host Agent"

@@ -4,16 +4,16 @@
 - name: " Stage 1 -  Enrole autoyast file to pxeserver"
   template:
     src: autoyast.xml.j2
-    dest: "/var/lib/tftpboot/img/autoyast/{{ item.key }}.xml"
+    dest: "/var/lib/tftpboot/img/autoyast/{{ item.name }}.xml"
   with_dict: "{{ host }}"
 
 - name: " Stage 1 -  Adding host to DHCP (group SLES12SP3)"
   blockinfile:
     block: |
-      host {{ item.key }}.{{ item.value.domain }} {
-      ddns-hostname "{{ item.key }}";
-      option host-name "{{ item.key }}.{{ item.value.domain }}";
-      hardware ethernet {{ item.value.interface.eth0.mac }};
+      host {{ item.name }}.{{ item.domain }} {
+      ddns-hostname "{{ item.name }}";
+      option host-name "{{ item.name }}.{{ item.domain }}";
+      hardware ethernet {{ item.interface.public.mac }};
       }
     insertafter: "group { # SLES12SP3"
     path: /etc/dhcp/dhcpd.conf
@@ -22,7 +22,7 @@
 - name: " Stage 1 -  Copy PXE template to pxeserver"
   template:
     src: pxefile-host.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.value.interface.eth0.mac |regex_replace(':','-')|lower }}"
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.interface.public.mac |regex_replace(':','-')|lower }}"
   with_dict: "{{ host }}"
 
 ######################################################################
@@ -42,7 +42,7 @@
     - name: " Stage 1 -  Waiting for autoyastfile to be loaded by installer - Please start the System NOW!"
       wait_for:
         path: "{{ tempfile.path }}"
-        search_regex: ".*/autoyast/{{ item.key }}.xml"
+        search_regex: ".*/autoyast/{{ item.name }}.xml"
       with_dict: "{{ host }}"
     - name: " Stage 1 -  Deleting temp logfile"
       file:
@@ -51,7 +51,7 @@
     - name: " Stage 1 -  remove PXE template"
       file:
         state: absent
-        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.value.interface.eth0.mac |regex_replace(':','-')|lower }}"
+        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.interface.public.mac |regex_replace(':','-')|lower }}"
       with_dict: "{{ host }}"
 
 - name: " Stage 1 -  Wait for installation to complete"
@@ -60,4 +60,4 @@
     sleep: 30
     delay: 180
     timeout: 2700
-  delegate_to: "{{ pxeserver.host_to_install }}"
+  delegate_to: "{{ item.interface.public.ip }}"
