@@ -35,4 +35,7 @@
   when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))
   tags:
     - hana-install
-
+- include_tasks: ./backup.yml
+  when: ( volumes.hana_backup is definded)
+  tags:
+    - hana-install

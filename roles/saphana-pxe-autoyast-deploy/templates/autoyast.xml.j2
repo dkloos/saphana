@@ -75,9 +75,7 @@
       </nameservers>
       <resolv_conf_policy>auto</resolv_conf_policy>
       <searchlist config:type="list">
-{% for item in item.domain %}
-        <search>{{ item }}</search>
-{% endfor %}
+        <search>{{ item.domain }}</search>
       </searchlist>
       <write_hostname config:type="boolean">false</write_hostname>
     </dns>

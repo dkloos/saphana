@@ -13,14 +13,14 @@
 #pxeserver
 #solman-prod-saphana
 
-[sol-dev:children]
-pxeserver
-solman-dev-saphana
-
-
-#[gcinst:children]
+#[sol-dev:children]
 #pxeserver
-#gctest-saphana
+#solman-dev-saphana
+
+
+[gcinst:children]
+pxeserver
+gctest-saphana
 
 ##############################################################################################
 # This Group hosts the pxeserver

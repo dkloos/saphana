@@ -26,7 +26,13 @@
     - set-hostname
     - hana-install
 
-- include_tasks: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/system-tuning.yml' }}"
+- include_tasks: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/os-tuning.yml' }}"
+  tags:
+    - osprep
+    - system-tuning
+    - hana-install
+
+- include_tasks: "{{ './' + ansible_distribution + ansible_distribution_major_version + '/os-hardening.yml' }}"
   tags:
     - osprep
     - system-tuning

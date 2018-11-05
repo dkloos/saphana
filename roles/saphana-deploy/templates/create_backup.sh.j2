@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ ! -d {{ volumes.hana_backup.mountpoint }} ]; then
+ mkdir {{ volumes.hana_backup.mountpoint }}
+fi
+
+chown {{ item.value.sid|lower }}adm {{ volumes.hana_backup.mountpoint }}
+
+su - {{ item.value.sid|lower }}adm -c "echo \"\c -i {{ item.value.instance_number }} -u SYSTEM -p {{ item.value.system_password }} -d SystemDB
+BACKUP DATA USING FILE ('{{ volumes.hana_backup.mountpoint }}')\" | hdbsql"
+
+if [ $? != "0" ]; then 
+exit 1
+fi
+
+# ONLY when using HANA 2.0
+# Only Prefix had to be defined with multiple container databases. otherweise there is a error
+su - {{ item.value.sid|lower }}adm -c "echo \"\c -i {{ item.value.instance_number }} -u SYSTEM -p {{ item.value.system_password }} -d {{ item.value.sid | upper }}
+BACKUP DATA USING FILE ('{{ item.value.sid | upper }}')\" | hdbsql"
+
+if [ $? != "0" ]; then
+exit 1
+fi
