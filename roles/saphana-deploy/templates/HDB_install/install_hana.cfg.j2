@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 [Server]
 
 # Skip all SAP Host Agent calls ( Default: n )
@@ -102,5 +103,20 @@ system_user_password={{ item.value.system_password }}
 # Restart system after machine reboot? ( Default: n )
 autostart={{ item.value.autostart | default('n') }}
 
-# Enable HANA repository ( Default: y )
-???LINES MISSING# Restart system after machine reboot? ( Default: n 
+# Inter Service Communication Mode ( Valid values: standard | ssl )
+isc_mode={{ item.value.isc_mode | default('') }}
+
+# Enable XS Engine ( Default: y )
+xs_engine={{ item.value.xs_engine | default('y') }}
+
+# XS Engine HTTP Port
+xs_engine_http_port={{ item.value.xs_engine_http_port | default('') }}
+
+# XS Engine HTTPS Port
+xs_engine_https_port={{ item.value.xs_engine_https_port | default('') }}
+
+# Imports delivery units ( Default: y )
+import_content={{ item.value.import_content | default('y') }}
+
+# Do not Modify '/etc/sudoers' File ( Default: n )
+skip_modify_sudoers=n

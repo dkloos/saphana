@@ -1,13 +1,13 @@
 ---
 - name: " Stage 2.1 -   Check if folder is present"
   stat:
-    path: "{{ software.source.path }}"
+    path: "{{ software.dest.path }}"
   register: insdir
 
 - name: " Stage 2.1 -   Copy installation folder from source"
   block:
     - file:
-        path: "{{ source.dest.path }}"
+        path: "{{ software.dest.path }}"
         state: directory
       when: insdir.stat.isdir is not defined
     - synchronize:
@@ -16,7 +16,7 @@
       delegate_to: "{{ software.source.server }}"
 
 - name: " Stage 2.1 -   Get HANA Version Information"
-  shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ software.source.path }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest
+  shell:  awk ' ( $1 == "fullversion:" ) { print $2}'  "{{ software.dest.path }}"/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/server/manifest
   changed_when: false
   register: hana_version
 

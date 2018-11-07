@@ -14,6 +14,24 @@
     dest: /tmp/hana_install_{{ item.value.sid|lower}}.cfg
   with_dict: "{{ instances }}"
 
+- name: " Stage 4.2 -   Create sap sid group"
+  group: 
+    name: "{{ item.value.sid|lower }}shm"
+    gid: "{{ item.value.sidadm_group_id }}"
+  with_dict: "{{ instances }}"
+
+- name: " Stage 4.2 -   Create sap sid user"
+  user:
+    name: "{{ item.value.sid|lower }}adm"
+    uid: "{{ item.value.sidadm_user_id }}"
+    group: "sapsys"
+    groups: "{{ item.value.sid|lower }}shm,sapsys"
+    home: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}/home"
+    password: "{{ item.value.sidadm_password|password_hash('sha512') }}"
+  with_dict: "{{ instances }}"
+  changed_when: false  
+
+
 - name: " Stage 4.2 -   Create usr sap directory"
   file:
     path: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}"
@@ -38,31 +56,10 @@
     state: directory
   with_dict: "{{ instances }}"
 
-- name: " Stage 4.2 -   Create sap sid group"
-  group: 
-    name: "{{ item.value.sid|lower }}shm"
-    gid: "{{ item.value.sidadm_group_id }}"
-  with_dict: "{{ instances }}"
-
-- name: " Stage 4.2 -   Create sap sid user"
-  user:
-    name: "{{ item.value.sid|lower }}adm"
-    uid: "{{ item.value.sidadm_user_id }}"
-    group: "sapsys"
-    groups: "{{ item.value.sid|lower }}shm"
-    home: "{{ volumes.usr_sap.mountpoint }}/{{ item.value.sid|upper }}/home"
-    password: "{{ item.value.sidadm_password|password_hash('sha512') }}"
-  with_dict: "{{ instances }}"
-  changed_when: false  
-
-
 - name: " Stage 4.2 -  execute unattended installation (logfile /var/log/hana_install_{{ item.value.sid|lower}}.log )"
   shell: ./hdblcm --configfile=/tmp/hana_install_{{ item.value.sid|lower}}.cfg -b --remote_execution=saphostagent {{ item.value.hdblcm_params| default('') }} >> /var/log/hana_install_{{ item.value.sid|lower}}.log
   args:
-    chdir: "{{ hana_installdir }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"
+    chdir: "{{ software.dest.path }}/DATA_UNITS/HDB_SERVER_LINUX_{{ ansible_architecture|upper }}/"
     creates: "/usr/sap/{{ item.value.sid|upper }}/HDB{{ item.value.instance_number }}/exe/hdbdaemon"
-  when: (deployment_instance is defined)
+#  when: (deployment_instance is defined)
   with_dict: "{{ instances }}"
-
-
-#FIXME: Confiure SAP Hana Backup / DAA / SLD Reg / inital Backup? / SR ?

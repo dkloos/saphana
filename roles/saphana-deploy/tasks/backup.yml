@@ -1,37 +1,58 @@
 ---
+- name: " Stage 4.2 -   Copy hdbsql script to host"
+  template:
+    src: HDB_install/execute_sql_systemdb.sql.j2
+    dest: /usr/local/bin/execute_sql_systemdb.sql
+    mode: 0755
+  with_dict: "{{ instances }}"
+  tags: debug
+
+- name: " Stage 4.2 -  Adding System User to hdbuserstore"
+  shell: su - pgradm -c "hdbuserstore SET SYSTEM {{ host.name }}.{{ host.domain }}:30013 system {{ item.value.system_password }}"
+  with_dict: "{{ instances }}"
+  tags: debug
+
+- name: " Stage 4.3 -   Save SID into var"
+  set_fact:
+    sid: "{{ item.value.sid }}"
+  with_dict: "{{ instances }}"
 
 - name: " Stage 4.3 -   Create backup-directory"
   file:
-    path: "{{ volumes.hana_backup.mountpoint }}/{{  item }}"
+    path: "{{ volumes.hana_backup.mountpoint }}/{{ item }}"
     state: directory
-    owner: "{{ instances.value.sid|lower }}adm" 
+    owner: "{{ sid|lower }}adm" 
+    group: "sapsys"
+    mode: '775'
   with_items:
     - data
     - log
 
 - name: " Stage 4.3 -   Change default Destination for Backups of the Backup Catalog"
-  lininfile:
-    path:/hana/shared/{{  instance.value.sid|upper  }}/global/hdb/custom/config/global.ini
-    regexp:"{{ item.regexp }}"
+  lineinfile:
+    path: "/hana/shared/{{ sid|upper }}/global/hdb/custom/config/global.ini"
+    regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    insertafter: "{{ item.insertafter }}"
+    insertafter: "{{ item.iafter }}"
   with_items:
-    - { regexp: '^[persistence]', line: '[persistence]', insertafter: ''}
-    - { regexp: '^basepath_catalogbackup', line: 'basepath_catalogbackup={{ volumes.hana_backup.mountpoint }}/log', insertafter: '[persistence]'}
-    - { regexp: '^basepath_databackup', line: 'basepath_databackup={{ volumes.hana_backup.mountpoint }}/data', insertafter: '[persistence]'}
-    - { regexp: '^basepath_logbackup', line: 'basepath_logbackup={{ volumes.hana_backup.mountpoint }}/log', insertafter: '[persistence]'}
+    - { regexp: '^\[persistence\]', line: '[persistence]', iafter: '' }
+    - { regexp: '^basepath_catalogbackup', line: 'basepath_catalogbackup = {{ volumes.hana_backup.mountpoint }}/log', iafter: '^\[persistence\]' }
+    - { regexp: '^basepath_databackup', line: 'basepath_databackup = {{ volumes.hana_backup.mountpoint }}/data', iafter: '^\[persistence\]' }
+    - { regexp: '^basepath_logbackup', line: 'basepath_logbackup = {{ volumes.hana_backup.mountpoint }}/log', iafter: '^\[persistence\]' }
   register: backup
-  when: volumes.hana.backup is defined
+  when: (volumes.hana_backup is defined)
+
+#- name: " Stage 4.3 -   Change default Destination for Backups of the Backup Catalog"
+#/usr/local/bin/hdbsql_systemdb.sh
 
 - name: " Stage 4.3 -   Copy Backup script to host"
-  templates:
+  template:
     src: create_backup.sh.j2
     dest: /usr/local/bin/create_backup.sh
     mode: 755
-  with_dict: " {{ instances }}"
-  when: backup.changed and volumes.hana.backup is defined
+  with_dict: "{{ instances }}"
+  when: ((backup.changed) and (volumes.hana_backup is defined))
 
 - name: " Stage 4.3 -   Create Backup"
-  shell: ./create_backup.sh
-    chdir: "/usr/local/bin/"
-  when: backup.changed and volumes.hana.backup is defined
+  shell: /usr/local/bin/create_backup.sh
+  when: ((backup.changed) and (volumes.hana_backup is defined))

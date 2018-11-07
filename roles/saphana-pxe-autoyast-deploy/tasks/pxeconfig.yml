@@ -1,33 +1,32 @@
 ---
-# tasks file for saphana-pxe-autoyast-deploy
+##########################################################################
+# Prepareing autoyast / kickstart files and pxe template for installation
+##########################################################################
 
 - name: " Stage 1 -  Enrole autoyast file to pxeserver"
   template:
     src: autoyast.xml.j2
-    dest: "/var/lib/tftpboot/img/autoyast/{{ item.name }}.xml"
-  with_dict: "{{ host }}"
+    dest: "/var/lib/tftpboot/img/autoyast/{{ host.name }}.xml"
 
 - name: " Stage 1 -  Adding host to DHCP (group SLES12SP3)"
   blockinfile:
     block: |
-      host {{ item.name }}.{{ item.domain }} {
-      ddns-hostname "{{ item.name }}";
-      option host-name "{{ item.name }}.{{ item.domain }}";
-      hardware ethernet {{ item.interface.public.mac }};
+      host {{ host.name }}.{{ host.domain }} {
+      ddns-hostname "{{ host.name }}";
+      option host-name "{{ host.name }}.{{ host.domain }}";
+      hardware ethernet {{ host.interface.public.mac }};
       }
-    insertafter: "group { # SLES12SP3"
+    insertafter: "group { # First default group"
     path: /etc/dhcp/dhcpd.conf
-  with_dict: "{{ host }}"
 
 - name: " Stage 1 -  Copy PXE template to pxeserver"
   template:
     src: pxefile-host.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.interface.public.mac |regex_replace(':','-')|lower }}"
-  with_dict: "{{ host }}"
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ host.interface.public.mac |regex_replace(':','-')|lower }}"
 
-######################################################################
-# Waiting until system  installation is triggered
-######################################################################
+##########################################################################
+# Waiting until system  installation is triggered and system is availanle
+##########################################################################
 
 - name: " Stage 1 -  Waiting for autoyastfile to be loaded by installer - Please start the System NOW!"
   block:
@@ -39,11 +38,12 @@
       shell: tail -n 0 -f /var/log/httpd/access_log > {{ tempfile.path }}
       async: 500
       poll: 0
-    - name: " Stage 1 -  Waiting for autoyastfile to be loaded by installer - Please start the System NOW!"
+    - debug:
+        msg: "#####################  ->    Please restart the System NOW!    <-  #####################"
+    - name: " Stage 1 -  Waiting for autoyastfile to be loaded by installer."
       wait_for:
         path: "{{ tempfile.path }}"
-        search_regex: ".*/autoyast/{{ item.name }}.xml"
-      with_dict: "{{ host }}"
+        search_regex: ".*/autoyast/{{ host.name }}.xml"
     - name: " Stage 1 -  Deleting temp logfile"
       file:
         path: "{{ tempfile.path }}"
@@ -51,8 +51,7 @@
     - name: " Stage 1 -  remove PXE template"
       file:
         state: absent
-        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.interface.public.mac |regex_replace(':','-')|lower }}"
-      with_dict: "{{ host }}"
+        path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ host.interface.public.mac |regex_replace(':','-')|lower }}"
 
 - name: " Stage 1 -  Wait for installation to complete"
   wait_for_connection:
@@ -60,4 +59,4 @@
     sleep: 30
     delay: 180
     timeout: 2700
-  delegate_to: "{{ item.interface.public.ip }}"
+  delegate_to: "{{ host.interface.public.ip }}"

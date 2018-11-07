@@ -1,8 +1,8 @@
+# {{ ansible_managed }}
 DEFAULT install
 PROMPT 0
 LABEL install
 MENU LABEL SLES 12 SP3 installation
 KERNEL img/SLES12SP3/linux
-APPEND initrd=img/SLES12SP3/initrd autoyast=http://{{ pxeserver.ip }}/ockimg/autoyast/{{ item.key }}.xml install=http://{{ pxeserver.ip }}/ockimg/SLES12SP3CD1
+APPEND initrd=img/SLES12SP3/initrd autoyast=http://{{ pxeserver.ip }}/ockimg/autoyast/{{ host.name }}.xml install=http://{{ pxeserver.ip }}/ockimg/SLES12SP3CD1
 IPAPPEND
-

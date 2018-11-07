@@ -2,13 +2,12 @@
 - name: Ensure that variables are present
   assert:
     that: 
-      - item.name is defined 
-      - item.domain is defined
-      - item.value.interface.eth0.mac is defined
-      - item.ntpserver is defined
-      - item.timezone is defined
-      - item.saptune_solution is defined
+      - host.name is defined 
+      - host.domain is defined
+      - host.interface.public.mac is defined
+      - host.ntpserver is defined
+      - host.timezone is defined
+      - host.saptune_solution is defined
       - software.source.server is defined
       - software.source.path is defined
-      - software.source.dest is defined
-  with_dict: "{{ host }}"
+      - software.dest.path is defined

@@ -1,39 +1,34 @@
 ---
 - name: " Stage 2.2 -   Check / set hostname"
   hostname:
-    name: "{{ item.name }}"
-  with_dict: "{{ host }}"
+    name: "{{ host.name }}"
 
 - name: " Stage 2.2 -   Setting correct hostname in /etc/hosts"
   lineinfile:
     path: /etc/hosts
-    regexp: "{{ item.name }}"
-    line: "{{ item.interface.public.ip }}  {{ item.name }}.{{ item.domain }}  {{ item.name }}"
-  with_dict: "{{ host }}"
+    regexp: "{{ host.name }}"
+    line: "{{ host.interface.public.ip }}  {{ host.name }}.{{ host.domain }}  {{ host.name }}"
 
 - name: " Stage 2.2 -   Setting DNS config"
-  lineinfile:
+  blockinfile:
     path: /etc/resolv.conf
-    line: "item.nameserver {{ item }}"
-  with_items: "{{ item.nameserver }}"
+    block: "nameserver {{ item }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
+  with_items: "{{ host.nameserver }}"
 
 - name: " Stage 2.2 -  Remove DVD repo"
   zypper_repository:
     state: absent
     name: 'SLE-12-SP3-SAP-12.3-0'
 
-########################
-# FIXME:  Suse registration
-##########################
 - name: check regitered status
   shell: SUSEConnect -s
   register: regstatus
-#  when: not ( (registration.regcode is undefined) or (registration.regcode is undefined is none) or (registration.regcode is undefined | trim == '') or (registration.email is undefined) or (registration.email is undefined is none) or (registration.email is undefined | trim == '') )
+  when: ( not  ( host.registration.regcode is undefined) or ( host.registration.regcode is none) or (host.registration.regcode is undefined | trim == '') or (host.registration.email is undefined) or (host.registration.email is none) or (registration.email is undefined | trim == '') )
   changed_when: false
 
 - name: " Stage 2.2 -   Register system"
   shell: "SUSEConnect -r {{ host.registration.regcode }} -e {{ host.registration.email }}"
-  with_dict: "{{ host }}"
   when: ("Not Registered" in regstatus.stdout)
 
 
@@ -47,22 +42,22 @@
     state: latest
     name: '*'
 
-#FIXME: Ensure that system reboots if new kernel are downlaoded here.
-#- shell: if [ $(zypper if kernel-default |grep Version |cut -d':' -f2|cut -d'-' -f1|tr -d ' ') > $(uname -r |cut -d'-' -f1) ];then echo "reboot"; fi
-#  changed_when: false
-#  register: compair_kernel
+- name: " Stage 2.2 - Comair Kernel versions"
+  shell: if [ $(zypper if kernel-default |grep Version |cut -d':' -f2|cut -d'-' -f1|tr -d ' ') != $(uname -r |cut -d'-' -f1|tr -d ' ') ];then echo "reboot"; fi
+  changed_when: false
+  register: compair_kernel
   
-#- name: " Stage 2.2 -  Restart system to reboot to newest kernel"
-#  shell: "sleep 5 && /sbin/shutdown -r now"
-#  async: 1
-#  poll: 0
-#  when: (compair_kernel.stdout == "reboot")
+- name: " Stage 2.2 -  Restart system to reboot to newest kernel"
+  shell: "sleep 5 && /sbin/shutdown -r now"
+  async: 1
+  poll: 0
+  when: (compair_kernel.stdout == "reboot")
 
-#- name: " Stage 2.2 -  Wait for system to become reachable again"
-#  wait_for_connection:
-#    delay: 60
-#    timeout: 300
-#  when: (compair_kernel.stdout == "reboot")
+- name: " Stage 2.2 -  Wait for system to become reachable again"
+  wait_for_connection:
+    delay: 60
+    timeout: 300
+  when: (compair_kernel.stdout == "reboot")
 
 - name: " Stage 2.2 -  Install required packages"
   zypper:
@@ -76,12 +71,13 @@
 
 - name: " Stage 2.2 -   Setting NTP server"
   block:
-   - lineinfile:
+   - blockinfile:
        path: /etc/ntp.conf
-       line: "server {{ host.ntpserver }}"
+       block: "server {{ host.ntpserver }}"
      notify: restart ntp
    - timezone:
        name: "{{ host.timezone }}"
+     notify: restart ntp
   when: not( (host.ntpserver is undefined) or (host.ntpserver is none) or (host.ntpserver | trim == '') )
 
 

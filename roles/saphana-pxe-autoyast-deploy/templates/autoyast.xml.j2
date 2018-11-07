@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE profile>
+<!-- {{ ansible_managed }} -->
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
   <add-on>
     <add_on_products config:type="list"/>
@@ -66,28 +67,29 @@
     <dns>
       <dhcp_hostname config:type="boolean">true</dhcp_hostname>
       
-      <domain>{{ item.domain }}</domain>
-      <hostname>{{ item.name }}</hostname>
+      <domain>{{ host.domain }}</domain>
+      <hostname>{{ host.name }}</hostname>
       <nameservers config:type="list">
-{% for item in item.nameserver %}
-        <nameserver>{{ item }}</nameserver>
+{% for inameserver in host.nameserver %}
+        <comment>test</comment>
+        <nameserver>{{ inameserver }}</nameserver>
 {% endfor %}
       </nameservers>
       <resolv_conf_policy>auto</resolv_conf_policy>
       <searchlist config:type="list">
-        <search>{{ item.domain }}</search>
+        <search>{{ host.domain }}</search>
       </searchlist>
       <write_hostname config:type="boolean">false</write_hostname>
     </dns>
     <interfaces config:type="list">
-{% for itemkey,item in item.interface.items %}
-{% if item.value.ip is defined %}
+{% for iinetkey,iintvalue in host.interface.items() %}
+{% if iintvalue.ip is defined %}
       <interface>
         <bootproto>static</bootproto>
-        <device>{{ item.name }}</device>
-        <ipaddr>{{ item.ip }}</ipaddr>			   
+        <device>{{ iintvalue.name }}</device>
+        <ipaddr>{{ iintvalue.ip }}</ipaddr>			   
         <name>VMXNET3 Ethernet Controller</name>
-        <netmask>{{ item.mask }}</netmask>
+        <netmask>{{ iintvalue.mask }}</netmask>
         <startmode>auto</startmode>						 
       </interface>
 {% endif %}
@@ -113,12 +115,12 @@
       <ipv4_forward config:type="boolean">false</ipv4_forward>
       <ipv6_forward config:type="boolean">false</ipv6_forward>
       <routes config:type="list">
-{% for itemkey,item in item.interface.items() %}
-{% if item.gateway is defined %}
+{% for inetkey,inetvalue in host.interface.items() %}
+{% if inetvalue.gateway is defined %}
        <route>
           <destination>default</destination>
-          <device>{{ item.name }}</device>
-          <gateway>{{ item.gateway }}</gateway>
+          <device>{{ inetvalue.name }}</device>
+          <gateway>{{ inetvalue.gateway }}</gateway>
           <netmask>-</netmask>
        </route>
 {% endif %}
@@ -152,7 +154,7 @@
   </scripts>
   <timezone>
     <hwclock>UTC</hwclock>
-    <timezone>{{ host.ntpserver.timezone }}</timezone>
+    <timezone>{{ host.timezone }}</timezone>
   </timezone>
   <groups config:type="list">
     <group>
@@ -416,14 +418,14 @@
     </drive>
   </partitioning>
   <files config:type="list">
-{% if ssh_keys_root_access is defined %}
+{% if host.ssh_keys_4_root_access is defined %}
       <file>
         <file_path>/root/.ssh/authorized_keys</file_path>
         <file_permissions>644</file_permissions>
         <file_contents>
 <![CDATA[
-{% for item in host.ssh_keys_root_access %}
-{{ item }}
+{% for sshkeys in host.ssh_keys_4_root_access %}
+{{ sshkeys }}
 {% endfor %}
 ]]>
        </file_contents>
@@ -431,8 +433,3 @@
 {% endif %}
   </files>
 </profile>
-
-
-
-
-

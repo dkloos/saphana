@@ -2,9 +2,8 @@
 - name: Ensure that variables are present
   assert:
     that: 
-      - item.name is defined 
-      - item.ip is defined 
-      - item.domain is defined 
-      - item.ntpserver is defined 
-      - item.nameserver is defined 
-  with_dict: "{{ host }}"
+      - host.name is defined 
+      - host.interface.public.ip is defined 
+      - host.domain is defined 
+      - host.ntpserver is defined 
+      - host.nameserver is defined 

@@ -12,14 +12,14 @@
 - name: " Stage 4.1 -   Create sapsys group"
   group: 
     name: sapsys 
-    gid: "{{ hostagent.sapadm_useri_id }}"
+    gid: "{{ saphostagent.sapadm_useri_id }}"
 
 - name: " Stage 4.1 -   Create sapadm user"
   user:
     name: sapadm
-    uid: "{{ hostagent.sapadm_useri_id }}"
+    uid: "{{ saphostagent.sapadm_useri_id }}"
     group: sapsys
-    password: "{{ hostagent.sapadm_password | password_hash('sha512') }}"
+    password: "{{ saphostagent.sapadm_password | password_hash('sha512') }}"
   changed_when: false
 
 - name: " Stage 4.1 -   Installation File SAP HANA Host Agent"
@@ -31,7 +31,6 @@
 - name: " Stage 4.1 -   Install SAP HANA Host Agent"
   shell: /usr/local/bin/install_saphostagent.sh
   args:
-#  creates: /usr/sap/hostctrl/exe/saphostexec
   changed_when: false
 
 # Setup sap hana Hostagent SSL
@@ -50,13 +49,11 @@
     src: hostagent_install/install_sslforsaphostagent.sh.j2
     dest: /usr/local/bin/install_sslforsaphostagent.sh
     mode: 0755
-  with_dict: "{{ host }}"
 
 - name: " Stage 4.1 -   Ensure SSL is configured for saphostagent"
   shell: /usr/local/bin/install_sslforsaphostagent.sh
   notify: "Restart HostAgent"
   args:
-#  creates: /usr/sap/hostctrl/exe/sec/SAPSSLS.pse 
   changed_when: false
 
 - name: " Stage 4.1 -   Change user for SAPSSLS.pse file for SAP Host Agent"

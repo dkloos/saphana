@@ -25,8 +25,14 @@
       ignore_errors: yes
 
 - debug:
-   msg: "######################     HANA DB already deployed - Skipping Installation  ######################"
+   msg: "######################     HANA DB already deployed and running- Skipping Installation  ######################"
   when: ('rc=0'  in hdbstatus.stdout)
+
+- debug:
+   msg: |
+     "######################     HANA DB is installed but not runnning - Skipping Installation  ######################"
+     "######################     {{ hdbstatus.stdout }}  ######################"
+  when: ('rc=1'  in hdbstatus.stdout)
 
 - include_tasks: ./hostagent.yml
   when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))
@@ -35,7 +41,11 @@
   when: (( hdbstatus.stdout is none) or (('GRAY' not in hdbstatus.stdout) and ('rc=0' not in hdbstatus.stdout)))
   tags:
     - hana-install
+
+#FIXME: Work in progress
 - include_tasks: ./backup.yml
   when: ( volumes.hana_backup is definded)
   tags:
     - hana-install
+    - backup
+    - debug

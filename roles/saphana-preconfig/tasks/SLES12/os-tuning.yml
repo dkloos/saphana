@@ -15,13 +15,12 @@
   changed_when: false
 
 - name: " Stage 2.3 -   Apply saptune profile"
-  shell: "saptune solution apply {{ saptune_solution }}"
+  shell: "saptune solution apply {{ host.saptune_solution }}"
   changed_when: false
 
 #SAP Note: https://launchpad.support.sap.com/#/notes/2205917
 - name: " Stage 2.3 -   Disable intel c states in grub config"
-  lineinfile: 
+  blockinfile: 
     dest: /etc/default/grub 
-    line: GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 numa_balancing=disable"
+    block: GRUB_CMDLINE_LINUX_DEFAULT="intel_idle.max_cstate=0 numa_balancing=disable"
   notify: regenerate grub2 conf
-  when: "ansible_os_family == 'SLES'"

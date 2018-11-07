@@ -17,10 +17,21 @@
 #pxeserver
 #solman-dev-saphana
 
-
-[gcinst:children]
+[grc-prod:children]
 pxeserver
-gctest-saphana
+grc-prod-saphana
+
+#[grc-dev:children]
+#pxeserver
+#grc-dev-saphana
+
+#[grc-qa:children]
+#pxeserver
+#grc-qa-saphana
+
+#[gcinst:children]
+#pxeserver
+#gctest-saphana
 
 ##############################################################################################
 # This Group hosts the pxeserver
@@ -37,6 +48,15 @@ localhost ansible_connection=local
 
 [solman-prod-saphana]
 192.168.207.35
+
+[grc-prod-saphana]
+192.168.207.38
+
+[grc-qa-saphana]
+192.168.207.37
+
+[grc-dev-saphana]
+192.168.207.36
 
 [solman-dev-saphana]
 192.168.207.34
