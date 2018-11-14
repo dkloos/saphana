@@ -1,8 +1,13 @@
 ---
-- hosts: pxeserver
+#- hosts: pxeserver
+#  roles:
+#    - saphana-pxe-autoyast-deploy
+- hosts: "*-saphana"
+  gather_facts: no
   roles:
     - saphana-pxe-autoyast-deploy
 - hosts: "*-saphana"
+  gather_facts: yes
   roles:
     - saphana-preconfig
     - saphana-fs

@@ -1,0 +1,9 @@
+#!/bin/bash
+# Ansible managed: /root/git/saphana/roles/saphana-deploy/templates/create_backup.sh.j2 modified on 2018-11-06 15:57:10 by root on pxeserver
+
+su - {{ item.value.sid|lower }}adm -c "echo \"\c -i {{ item.value.instance_number }} -U SYSTEM
+$1 \" | hdbsql"
+
+if [ $? != "0" ]; then
+exit 1
+fi

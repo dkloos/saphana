@@ -7,6 +7,7 @@
   template:
     src: autoyast.xml.j2
     dest: "/var/lib/tftpboot/img/autoyast/{{ host.name }}.xml"
+  delegate_to: "{{ pxeserver.ip }}"
 
 - name: " Stage 1 -  Adding host to DHCP (group SLES12SP3)"
   blockinfile:
@@ -18,11 +19,13 @@
       }
     insertafter: "group { # First default group"
     path: /etc/dhcp/dhcpd.conf
+  delegate_to: "{{ pxeserver.ip }}"
 
 - name: " Stage 1 -  Copy PXE template to pxeserver"
   template:
     src: pxefile-host.j2
     dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ host.interface.public.mac |regex_replace(':','-')|lower }}"
+  delegate_to: "{{ pxeserver.ip }}"
 
 ##########################################################################
 # Waiting until system  installation is triggered and system is availanle
@@ -52,6 +55,7 @@
       file:
         state: absent
         path: "/var/lib/tftpboot/pxelinux.cfg/01-{{ host.interface.public.mac |regex_replace(':','-')|lower }}"
+  delegate_to: "{{ pxeserver.ip }}"
 
 - name: " Stage 1 -  Wait for installation to complete"
   wait_for_connection:

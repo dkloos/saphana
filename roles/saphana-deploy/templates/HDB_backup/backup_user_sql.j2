@@ -1,0 +1,14 @@
+-- create role backup admin
+-- DROP ROLE backup_admin;
+CREATE ROLE backup_admin;
+GRANT BACKUP ADMIN, CATALOG READ, DATABASE ADMIN TO backup_admin;
+call GRANT_ACTIVATED_ROLE ('sap.hana.backup.roles::Administrator', 'SYSTEM');
+
+-- create user backupadm admin
+CREATE USER backupadm PASSWORD {{ item.value.sidadm_password }};
+GRANT backup_admin TO backupadm;
+
+-- create user backup operator
+-- CREATE USER backupop PASSWORD <enter_complex_password> NO FORCE_FIRST_PASSWORD_CHANGE;
+-- GRANT BACKUP OPERATOR to backupop;
+-- ALTER USER backupop DISABLE PASSWORD LIFETIME;

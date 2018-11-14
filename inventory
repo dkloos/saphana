@@ -9,30 +9,6 @@
 # Only one installation group can be activated right now.
 ##############################################################################################
 
-#[sol-prod:children]
-#pxeserver
-#solman-prod-saphana
-
-#[sol-dev:children]
-#pxeserver
-#solman-dev-saphana
-
-[grc-prod:children]
-pxeserver
-grc-prod-saphana
-
-#[grc-dev:children]
-#pxeserver
-#grc-dev-saphana
-
-#[grc-qa:children]
-#pxeserver
-#grc-qa-saphana
-
-#[gcinst:children]
-#pxeserver
-#gctest-saphana
-
 ##############################################################################################
 # This Group hosts the pxeserver
 ##############################################################################################

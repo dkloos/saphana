@@ -12,6 +12,7 @@
   changed_when: false
   ignore_errors: yes
   register: ping_result
+  delegate_to: "{{ pxeserver.ip }}"
    
 - include_tasks: ./pxeconfig.yml
   when: ('100% packet loss' in ping_result.stdout)
