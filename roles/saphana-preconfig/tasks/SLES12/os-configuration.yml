@@ -73,7 +73,7 @@
   block:
    - blockinfile:
        path: /etc/ntp.conf
-       block: "server {{ host.ntpserver }}"
+       block: "server {{ host.ntpserver }} iburst"
      notify: restart ntp
    - timezone:
        name: "{{ host.timezone }}"
